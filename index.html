@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+	<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+		<link rel="stylesheet" href="css/leaflet.css" />
+		<link rel="stylesheet" href="css/mycss.css" />
+    <link rel="stylesheet" href="css/bootstrap.css" />
+		<script src="js/leaflet.js"></script>
+    <script src="js/bootstrap.js"></script>
+	</head>
+	<body>
+		<div id="menu" style="border: thin black solid; width: 100%; height: 5vh;">
+      		<div>
+      			<input id="file-input" size="20" type="file">
+      			<span style="margin-left: 20px" id="latLang"></span>
+      		</div>      		
+    	</div>
+    	<!-- <div>
+    		<div id="map" style="border: thin black solid; width: 80%; height: 90vh;"></div>
+    		<span id="info" style="border: thin black solid; width: 20%; height: 90vh;"><p>Hola Radiola</span>
+    	</div> -->
+    	
+    	<div class="float-container">
+		  	<div class="float-child_map" id="map"></div>
+		  	<div class="float-child_info" id="info"></div>
+		</div>
+		<script>
+		    var nombre='';
+		    var xml = new XMLHttpRequest();
+			var map = L.map('map').setView([41.125, 1.238], 13);
+			L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+				maxZoom: 18,
+			    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+			}).addTo(map);
+	      
+	      	//L.control.scale(metric).addTo(map)
+	      	
+	      	/*
+	      	// Poner un marcador en el mapa
+	      	L.marker([41.124302580367235, 1.2385328405983511]).addTo(map)
+				    .bindPopup('Hospital Universitario Joan XXIII.')
+				    .openPopup();
+			*/
+
+			map.on('click', onMapClick);
+
+			function onMapClick(e) {
+			    //alert("Has clicado en la posicion " + e.latlng);
+			    document.getElementById("latLang").innerHTML=e.latlng;
+
+			}
+
+	        function leerArchivo(e) {
+		        var archivo = e.target.files[0];
+		        if (!archivo) {
+		          return;
+		        }
+		        nombre=archivo.name;
+		        nombre = "tracks/"+nombre;
+		        loadDoc(nombre);
+		    }
+
+		    document.getElementById('file-input')
+		      .addEventListener('change', leerArchivo, false);
+
+		    function loadDoc(nombre){
+	      		xml.open("GET", nombre, false);
+		      	xml.send();
+		      //	myFunction(xml);//(this);
+		    
+			  	var xmlDoc = xml.responseXML;
+
+			  	var x=xmlDoc.getElementsByTagName("desc");
+			  	
+			  	var info =''; 
+
+			  	for(i=0;i<x.length;i++){
+			  		info += x[i].childNodes[0].nodeValue;
+			  	}
+
+			  	document.getElementById('info').innerHTML=info;
+
+			  	var x=xmlDoc.getElementsByTagName("trkpt");
+
+		    	var latlang = [];
+
+			  	for (i=0;i<x.length;i++)
+				  {     
+				    var arraytemp = [x[i].attributes['lat'].value, x[i].attributes['lon'].value]
+				    latlang.push(arraytemp);
+				    //console.log(x[i].attributes['lon']);
+				  }
+
+			  	clearMap();
+				var polyLineOptions = {color:'red'};
+	        	var polyLine = L.polyline(latlang , polyLineOptions);
+	        	polyLine.addTo(map);
+		    }
+
+		    function clearMap() {
+			    for(i in map._layers) {
+			        if(map._layers[i]._path != undefined) {
+			            try {
+			                map.removeLayer(map._layers[i]);
+			            }
+			            catch(e) {
+			                console.log("problem with " + e + map._layers[i]);
+			            }
+			        }
+			    }
+			}	
+		</script>
+	</body>
+</html>
