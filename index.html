@@ -12,20 +12,17 @@
     <script src="js/bootstrap.js"></script>
 	</head>
 	<body>
-		<div id="menu" style="border: thin black solid; width: 100%; height: 5vh;">
-      		<div>
-      			<input id="file-input" size="20" type="file">
-      			<span style="margin-left: 20px" id="latLang"></span>
-      		</div>      		
-    	</div>
-    	<!-- <div>
-    		<div id="map" style="border: thin black solid; width: 80%; height: 90vh;"></div>
-    		<span id="info" style="border: thin black solid; width: 20%; height: 90vh;"><p>Hola Radiola</span>
-    	</div> -->
-    	
-    	<div class="float-container">
-		  	<div class="float-child_map" id="map"></div>
-		  	<div class="float-child_info" id="info"></div>
+		<div class="container-fluid" >
+			<div class="row" style="margin-top: 05px;padding-top: 5px;padding-bottom: 5px;margin-bottom: 5px;">
+				<div class="col-sm-8" id="menu">
+					<input id="file-input" size="20" type="file"></div>
+				<div class="col-sm-2 text-end" id="latLang" style="padding-right: 0px;"></div>
+				<div class="col-sm-2 text-center" id="tituloInfo" style="padding-right: 0px;"></div>
+			</div>
+			<div class="row" style="height: 90vh;margin-left: 0px;"">
+				<div class="col-sm-10" id="map" ></div>
+				<div class="col-sm-2" id="info"></div>	
+			</div>
 		</div>
 		<script>
 		    var nombre='';
@@ -49,8 +46,7 @@
 
 			function onMapClick(e) {
 			    //alert("Has clicado en la posicion " + e.latlng);
-			    document.getElementById("latLang").innerHTML=e.latlng;
-
+			    document.getElementById("latLang").innerHTML='<h5>'+e.latlng+'</h5>';
 			}
 
 	        function leerArchivo(e) {
@@ -69,29 +65,27 @@
 		    function loadDoc(nombre){
 	      		xml.open("GET", nombre, false);
 		      	xml.send();
-		      //	myFunction(xml);//(this);
 		    
 			  	var xmlDoc = xml.responseXML;
-
-			  	var x=xmlDoc.getElementsByTagName("desc");
-			  	
+			  	var x=xmlDoc.getElementsByTagName("desc");	  	
 			  	var info =''; 
 
 			  	for(i=0;i<x.length;i++){
 			  		info += x[i].childNodes[0].nodeValue;
 			  	}
-
-			  	document.getElementById('info').innerHTML=info;
-
+				const descArray = info.split("<br />");
+				var titulo = descArray[1].replace(/h3/g,'h5')
+			  	document.getElementById('tituloInfo').innerHTML=titulo;
+				document.getElementById('info').innerHTML=descArray[0]+'<FONT SIZE=2>'+descArray[2]+'</font>';
+console.log(descArray[0]);
+console.log(descArray[1]);
+console.log(descArray[2]);
 			  	var x=xmlDoc.getElementsByTagName("trkpt");
-
 		    	var latlang = [];
-
 			  	for (i=0;i<x.length;i++)
 				  {     
 				    var arraytemp = [x[i].attributes['lat'].value, x[i].attributes['lon'].value]
 				    latlang.push(arraytemp);
-				    //console.log(x[i].attributes['lon']);
 				  }
 
 			  	clearMap();
