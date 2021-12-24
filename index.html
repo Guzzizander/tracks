@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html>
 	<head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Visod de tracks</title>
+
+		<!-- Required meta tags -->
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
     
 		<link rel="stylesheet" href="css/leaflet.css" />
 		<link rel="stylesheet" href="css/mycss.css" />
-    <link rel="stylesheet" href="css/bootstrap.css" />
+    	<link rel="stylesheet" href="css/bootstrap.css" />
 		<script src="js/leaflet.js"></script>
-    <script src="js/bootstrap.js"></script>
+    	<script src="js/bootstrap.js"></script>
+		<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />		
 	</head>
 	<body>
 		<div class="container-fluid" >
@@ -33,10 +36,44 @@
 			    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 			}).addTo(map);
 			var grupoCapas = L.layerGroup().addTo(map);
-	      
-	      	//L.control.scale(metric).addTo(map)
+			var marcadorPosicion = L.layerGroup().addTo(map);
 	      	
-	      	/*
+			// Creo los iconos
+			var iconosSize=[15,25];
+			var iSalida = L.icon({
+				iconUrl: 'images/start.png',
+				//  shadowUrl: 'leaf-shadow.png',
+
+				iconSize:     iconosSize, // size of the icon
+				//shadowSize:   [50, 64], // size of the shadow
+				//iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
+				//shadowAnchor: [4, 62],  // the same for the shadow
+				//popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+			});
+
+			var iLlegada = L.icon({
+				iconUrl: 'images/racing-flag.png',
+				//  shadowUrl: 'leaf-shadow.png',
+				iconSize:    iconosSize, // size of the icon
+				//shadowSize:   [50, 64], // size of the shadow
+				//iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
+				//shadowAnchor: [4, 62],  // the same for the shadow
+				//popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+			});
+
+			var iMarcador = L.icon({
+				iconUrl: 'images/marker-icon.png',
+				//  shadowUrl: 'leaf-shadow.png',
+				iconSize:    iconosSize, // size of the icon
+				//shadowSize:   [50, 64], // size of the shadow
+				//iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
+				//shadowAnchor: [4, 62],  // the same for the shadow
+				//popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+			});			
+			
+			//L.control.scale(metric).addTo(map)
+	      	
+			/*
 	      	// Poner un marcador en el mapa
 	      	L.marker([41.124302580367235, 1.2385328405983511]).addTo(map)
 				    .bindPopup('Hospital Universitario Joan XXIII.')
@@ -44,11 +81,18 @@
 			*/
 
 			map.on('click', onMapClick);
-
+			
 			function onMapClick(e) {
-			    //alert("Has clicado en la posicion " + e.latlng);
-			    var posicion = 'Posición: '+e.latlng.lat+', '+e.latlng.lng;
-			    document.getElementById("latLang").innerHTML=posicion;
+				marcadorPosicion.clearLayers();
+			    var posicionMarcador = e.latlng;
+				var posicionMarcadorTxt = e.latlng.lat+', '+e.latlng.lng;
+				L.marker(posicionMarcador,{icon: iMarcador}).addTo(marcadorPosicion)
+					.bindPopup(posicionMarcadorTxt)
+					.openPopup();
+				/*
+				var posicion = 'Posición: '+e.latlng.lat+', '+e.latlng.lng;
+				document.getElementById("latLang").innerHTML=posicion;
+				*/
 			}
 
 	        function leerArchivo(e) {
@@ -70,17 +114,6 @@
 		    
 			  	var xmlDoc = xml.responseXML;
 			  	var x=xmlDoc.getElementsByTagName("desc");	  	
-			  	/*			  	
-			  	var info =''; 
-
-			  	for(i=0;i<x.length;i++){
-			  		info += x[i].childNodes[0].nodeValue;
-			  	}
-				const descArray = info.split("<br />");
-				var titulo = descArray[1].replace(/h3/g,'h5')
-			  	document.getElementById('tituloInfo').innerHTML=titulo;
-				document.getElementById('info').innerHTML=descArray[0]+'<FONT SIZE=2>'+descArray[2]+'</font>';
-				*/
 
 				var info=x[1].childNodes[0].nodeValue;
 				document.getElementById('tituloInfo').innerHTML="Estadistica track";
@@ -96,46 +129,17 @@
 
 				var salida = latlang[0];  
 				var llegada = latlang[latlang.length-1];  
-			  	// Creo los iconos
-			  	var iconosSize=[15,25];
-			  	var iSalida = L.icon({
-				    iconUrl: 'images/start.png',
-				  	//  shadowUrl: 'leaf-shadow.png',
-
-				    iconSize:     [15, 25], // size of the icon
-				    //shadowSize:   [50, 64], // size of the shadow
-				    //iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
-				    //shadowAnchor: [4, 62],  // the same for the shadow
-				    //popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
-				});
-
-				var iLlegada = L.icon({
-				    iconUrl: 'images/racing-flag.png',
-				  	//  shadowUrl: 'leaf-shadow.png',
-				    iconSize:    iconosSize, // size of the icon
-				    //shadowSize:   [50, 64], // size of the shadow
-				    //iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
-				    //shadowAnchor: [4, 62],  // the same for the shadow
-				    //popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
-				});
 			  	clearMap();
 				var polyLineOptions = {color:'red'};
 	        	var polyLine = L.polyline(latlang , polyLineOptions);
 	        	//polyLine.addTo(map);
 	        	polyLine.addTo(grupoCapas);
-	        	/*
-	        	// Iconos con pop-ups
-	        	L.marker(salida, {icon: iSalida}).addTo(map).bindPopup('SALIDA').openPopup();
-	        	L.marker(llegada, {icon: iLlegada}).addTo(map).bindPopup('LLEGADA').openPopup();
-	        	*/
 	        	L.marker(salida, {icon: iSalida}).addTo(grupoCapas);
 	        	L.marker(llegada, {icon: iLlegada}).addTo(grupoCapas);	        	
 		    }
 
 		    function clearMap() {
-
-		   	grupoCapas.clearLayers();
-
+		   		grupoCapas.clearLayers();
 			    for(i in map._layers) {
 			        if(map._layers[i]._path != undefined) {
 			            try {
