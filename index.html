@@ -14,9 +14,9 @@
 	<body>
 		<div class="container-fluid" >
 			<div class="row" style="margin-top: 05px;padding-top: 5px;padding-bottom: 5px;margin-bottom: 5px;">
-				<div class="col-sm-8" id="menu">
+				<div class="col-sm-7" id="menu">
 					<input id="file-input" size="20" type="file"></div>
-				<div class="col-sm-2 text-end" id="latLang" style="padding-right: 0px;"></div>
+				<div class="col-sm-3 text-end" id="latLang" style="padding-right: 0px;"></div>
 				<div class="col-sm-2 text-center" id="tituloInfo" style="padding-right: 0px;"></div>
 			</div>
 			<div class="row" style="height: 90vh;margin-left: 0px;"">
@@ -32,6 +32,7 @@
 				maxZoom: 18,
 			    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 			}).addTo(map);
+			var grupoCapas = L.layerGroup().addTo(map);
 	      
 	      	//L.control.scale(metric).addTo(map)
 	      	
@@ -46,7 +47,8 @@
 
 			function onMapClick(e) {
 			    //alert("Has clicado en la posicion " + e.latlng);
-			    document.getElementById("latLang").innerHTML='<h5>'+e.latlng+'</h5>';
+			    var posicion = 'Posición: '+e.latlng.lat+', '+e.latlng.lng;
+			    document.getElementById("latLang").innerHTML=posicion;
 			}
 
 	        function leerArchivo(e) {
@@ -68,6 +70,7 @@
 		    
 			  	var xmlDoc = xml.responseXML;
 			  	var x=xmlDoc.getElementsByTagName("desc");	  	
+			  	/*			  	
 			  	var info =''; 
 
 			  	for(i=0;i<x.length;i++){
@@ -77,9 +80,12 @@
 				var titulo = descArray[1].replace(/h3/g,'h5')
 			  	document.getElementById('tituloInfo').innerHTML=titulo;
 				document.getElementById('info').innerHTML=descArray[0]+'<FONT SIZE=2>'+descArray[2]+'</font>';
-console.log(descArray[0]);
-console.log(descArray[1]);
-console.log(descArray[2]);
+				*/
+
+				var info=x[1].childNodes[0].nodeValue;
+				document.getElementById('tituloInfo').innerHTML="Estadistica track";
+				document.getElementById('info').innerHTML='<FONT SIZE=2>'+info+'</font>';
+
 			  	var x=xmlDoc.getElementsByTagName("trkpt");
 		    	var latlang = [];
 			  	for (i=0;i<x.length;i++)
@@ -88,13 +94,48 @@ console.log(descArray[2]);
 				    latlang.push(arraytemp);
 				  }
 
+				var salida = latlang[0];  
+				var llegada = latlang[latlang.length-1];  
+			  	// Creo los iconos
+			  	var iconosSize=[15,25];
+			  	var iSalida = L.icon({
+				    iconUrl: 'images/start.png',
+				  	//  shadowUrl: 'leaf-shadow.png',
+
+				    iconSize:     [15, 25], // size of the icon
+				    //shadowSize:   [50, 64], // size of the shadow
+				    //iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
+				    //shadowAnchor: [4, 62],  // the same for the shadow
+				    //popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+				});
+
+				var iLlegada = L.icon({
+				    iconUrl: 'images/racing-flag.png',
+				  	//  shadowUrl: 'leaf-shadow.png',
+				    iconSize:    iconosSize, // size of the icon
+				    //shadowSize:   [50, 64], // size of the shadow
+				    //iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
+				    //shadowAnchor: [4, 62],  // the same for the shadow
+				    //popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+				});
 			  	clearMap();
 				var polyLineOptions = {color:'red'};
 	        	var polyLine = L.polyline(latlang , polyLineOptions);
-	        	polyLine.addTo(map);
+	        	//polyLine.addTo(map);
+	        	polyLine.addTo(grupoCapas);
+	        	/*
+	        	// Iconos con pop-ups
+	        	L.marker(salida, {icon: iSalida}).addTo(map).bindPopup('SALIDA').openPopup();
+	        	L.marker(llegada, {icon: iLlegada}).addTo(map).bindPopup('LLEGADA').openPopup();
+	        	*/
+	        	L.marker(salida, {icon: iSalida}).addTo(grupoCapas);
+	        	L.marker(llegada, {icon: iLlegada}).addTo(grupoCapas);	        	
 		    }
 
 		    function clearMap() {
+
+		   	grupoCapas.clearLayers();
+
 			    for(i in map._layers) {
 			        if(map._layers[i]._path != undefined) {
 			            try {
