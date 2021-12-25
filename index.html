@@ -19,7 +19,7 @@
 			<div class="row" style="margin-top: 05px;padding-top: 5px;padding-bottom: 5px;margin-bottom: 5px;">
 				<div class="col-sm-7" id="menu">
 					<input id="file-input" size="20" type="file"></div>
-				<div class="col-sm-3 text-end" id="latLang" style="padding-right: 0px;"></div>
+				<div class="col-sm-3 text-end" id="creador" style="padding-right: 0px;"></div>
 				<div class="col-sm-2 text-center" id="tituloInfo" style="padding-right: 0px;"></div>
 			</div>
 			<div class="row" style="height: 90vh;margin-left: 0px;"">
@@ -35,6 +35,7 @@
 				maxZoom: 18,
 			    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 			}).addTo(map);
+			L.control.scale({imperial:false}).addTo(map);
 			var grupoCapas = L.layerGroup().addTo(map);
 			var marcadorPosicion = L.layerGroup().addTo(map);
 	      	
@@ -71,8 +72,6 @@
 				//popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
 			});			
 			
-			//L.control.scale(metric).addTo(map)
-	      	
 			/*
 	      	// Poner un marcador en el mapa
 	      	L.marker([41.124302580367235, 1.2385328405983511]).addTo(map)
@@ -80,8 +79,12 @@
 				    .openPopup();
 			*/
 
+			// Eventos
 			map.on('click', onMapClick);
-			
+
+		    document.getElementById('file-input')
+		      .addEventListener('change', leerArchivo, false);			
+
 			function onMapClick(e) {
 				marcadorPosicion.clearLayers();
 			    var posicionMarcador = e.latlng;
@@ -105,37 +108,16 @@
 		        loadDoc(nombre);
 		    }
 
-		    document.getElementById('file-input')
-		      .addEventListener('change', leerArchivo, false);
-
 		    function loadDoc(nombre){
 	      		xml.open("GET", nombre, false);
 		      	xml.send();
 		    
 			  	var xmlDoc = xml.responseXML;
-			  	var x=xmlDoc.getElementsByTagName("desc");	  	
-
-				var info=x[1].childNodes[0].nodeValue;
-				document.getElementById('tituloInfo').innerHTML="Estadistica track";
-				document.getElementById('info').innerHTML='<FONT SIZE=2>'+info+'</font>';
-
-			  	var x=xmlDoc.getElementsByTagName("trkpt");
-		    	var latlang = [];
-			  	for (i=0;i<x.length;i++)
-				  {     
-				    var arraytemp = [x[i].attributes['lat'].value, x[i].attributes['lon'].value]
-				    latlang.push(arraytemp);
-				  }
-
-				var salida = latlang[0];  
-				var llegada = latlang[latlang.length-1];  
-			  	clearMap();
-				var polyLineOptions = {color:'red'};
-	        	var polyLine = L.polyline(latlang , polyLineOptions);
-	        	//polyLine.addTo(map);
-	        	polyLine.addTo(grupoCapas);
-	        	L.marker(salida, {icon: iSalida}).addTo(grupoCapas);
-	        	L.marker(llegada, {icon: iLlegada}).addTo(grupoCapas);	        	
+				creador(xmlDoc);
+				buscaEstadisticas(xmlDoc);
+				var ruta = cargaRuta(xmlDoc);
+				dibujaRuta(ruta);
+				wayPoints(xmlDoc);
 		    }
 
 		    function clearMap() {
@@ -151,6 +133,64 @@
 			        }
 			    }
 			}	
+		
+			function creador(xmlDoc){
+				// Mira el creador de la ruta
+				var x = xmlDoc.getElementsByTagName("gpx"); 
+				var creador = x[0].attributes['creator'].value;
+				document.getElementById("creador").innerHTML="Creado por: "+creador;
+			}
+
+			function buscaEstadisticas(xmlDoc){
+				// Mira si hay estadisticas de la ruta
+				try{
+				  	var x=xmlDoc.getElementsByTagName("desc");	  	
+					var info=x[1].childNodes[0].nodeValue;
+					document.getElementById('tituloInfo').innerHTML="Estadistica track";
+					document.getElementById('info').innerHTML='<FONT SIZE=2>'+info+'</font>';
+				} catch(e){
+					document.getElementById('tituloInfo').innerHTML='';
+					document.getElementById('info').innerHTML='';
+				}	
+			}
+	
+			function cargaRuta(xmlDoc){
+				var x=xmlDoc.getElementsByTagName("trkpt");
+		    	var latlang = [];
+			  	for (i=0;i<x.length;i++){     
+				    var arraytemp = [x[i].attributes['lat'].value, x[i].attributes['lon'].value]
+				    latlang.push(arraytemp);
+				}
+				return latlang;
+			}
+
+			function dibujaRuta(ruta){
+				var salida = ruta[0];  
+				var llegada = ruta[ruta.length-1];  
+			  	clearMap();
+				// Mueve el mapa a la salida de la ruta
+				map.setView(salida, 12);
+				
+				// Dibuja la ruta
+				var polyLineOptions = {color:'red'};
+	        	var polyLine = L.polyline(ruta , polyLineOptions);
+	        	//polyLine.addTo(map);
+	        	polyLine.addTo(grupoCapas);
+	        	L.marker(salida, {icon: iSalida}).addTo(grupoCapas);
+	        	L.marker(llegada, {icon: iLlegada}).addTo(grupoCapas);	 
+			}
+
+			function wayPoints(xmlDoc){
+				var x=xmlDoc.getElementsByTagName("wpt");
+				var wp=[];
+				for(i=0;i<x.length;i++){
+					var arraytemp = [x[i].attributes['lat'].value, x[i].attributes['lon'].value]
+				    wp.push(arraytemp);
+				}
+				console.log(wp);
+
+			}
+
 		</script>
 	</body>
 </html>
