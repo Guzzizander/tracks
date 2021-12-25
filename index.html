@@ -181,16 +181,16 @@
 			}
 
 			function wayPoints(xmlDoc){
+				// Dibuja los WP en el mapa
 				var x=xmlDoc.getElementsByTagName("wpt");
-				var wp=[];
 				for(i=0;i<x.length;i++){
-					var arraytemp = [x[i].attributes['lat'].value, x[i].attributes['lon'].value]
-				    wp.push(arraytemp);
+					var nombre = x[i].getElementsByTagName('name')[0].textContent;
+					var arraytemp = [x[i].attributes['lat'].value, x[i].attributes['lon'].value,x[i]];
+					L.marker(arraytemp,{icon:iMarcador}).addTo(grupoCapas)
+						.bindPopup(nombre)
+						.openPopup();
 				}
-				console.log(wp);
-
 			}
-
 		</script>
 	</body>
 </html>
