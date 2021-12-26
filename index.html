@@ -27,15 +27,16 @@
 				<div class="col-sm-10" id="map" ></div>
 				<div class="col-sm-2" id="info"></div>	
 			</div>
-			<div class="row" style="height: 20vh;margin-left: 0px;">
-				<div class="col-sm-10" id="map" id="grafica"></div>
+			<div class="row" style="margin-left: 0px;">
+				<div class="col-sm-10" id="grafica"></div>
 			</div>
 		</div>
 		<script>
 		    var nombre='';
 		    var xml = new XMLHttpRequest();
 			var ruta=[];
-			var elevacion=[];
+			var elevacionX=[];
+			var elevacionY=[];
 			var map = L.map('map').setView([41.125, 1.238], 13);
 			L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 				maxZoom: 18,
@@ -132,9 +133,9 @@
 				creador(xmlDoc);
 				buscaEstadisticas(xmlDoc);
 				cargaRuta(xmlDoc);
-				console.log(ruta);
 				dibujaRuta(ruta);
 				wayPoints(xmlDoc);
+				graficaElevacion();
 		    }
 
 		    function clearMap() {
@@ -174,9 +175,14 @@
 			function cargaRuta(xmlDoc){
 				var x=xmlDoc.getElementsByTagName("trkpt");
 		    	var latlang = [];
+				var ele = [];
 			  	for (i=0;i<x.length;i++){     
 				    var arraytemp = [x[i].attributes['lat'].value, x[i].attributes['lon'].value]
 				    latlang.push(arraytemp);
+					//if (i%10 == 0){
+						elevacionY.push(x[i].getElementsByTagName('ele')[0].textContent);
+						elevacionX.push(i);
+					//}
 				}
 				ruta= latlang;
 			}
@@ -214,6 +220,29 @@
 							.openPopup();
 					}
 				}
+			}
+
+			function graficaElevacion(elevacion){
+				var grafica1={
+					x: elevacionX,
+					y: elevacionY,
+					type: 'scatter'
+				}
+				var data=[grafica1];
+				var layout = {
+					title: 'Sales Growth',
+					xaxis: {
+						title: 'Year',
+						showgrid: false,
+						zeroline: false
+					},
+					yaxis: {
+						title: 'Percent',
+						showline: false
+					}
+				};
+				console.log(data);
+				Plotly.newPlot('grafica', data,layout);
 			}
 		</script>
 	</body>
