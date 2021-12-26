@@ -12,6 +12,7 @@
     	<link rel="stylesheet" href="css/bootstrap.css" />
 		<script src="js/leaflet.js"></script>
     	<script src="js/bootstrap.js"></script>
+		<script src="js/plotly-2.8.3.min.js"></script>
 		<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />		
 	</head>
 	<body>
@@ -22,14 +23,19 @@
 				<div class="col-sm-3 text-end" id="creador" style="padding-right: 0px;"></div>
 				<div class="col-sm-2 text-center" id="tituloInfo" style="padding-right: 0px;"></div>
 			</div>
-			<div class="row" style="height: 90vh;margin-left: 0px;"">
+			<div class="row" style="height: 75vh;margin-left: 0px;">
 				<div class="col-sm-10" id="map" ></div>
 				<div class="col-sm-2" id="info"></div>	
+			</div>
+			<div class="row" style="height: 20vh;margin-left: 0px;">
+				<div class="col-sm-10" id="map" id="grafica"></div>
 			</div>
 		</div>
 		<script>
 		    var nombre='';
 		    var xml = new XMLHttpRequest();
+			var ruta=[];
+			var elevacion=[];
 			var map = L.map('map').setView([41.125, 1.238], 13);
 			L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 				maxZoom: 18,
@@ -70,7 +76,17 @@
 				//iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
 				//shadowAnchor: [4, 62],  // the same for the shadow
 				//popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
-			});			
+			});	
+			
+			var iWayPoint = L.icon({
+				iconUrl: 'images/gps.png',
+				//  shadowUrl: 'leaf-shadow.png',
+				iconSize:    iconosSize, // size of the icon
+				//shadowSize:   [50, 64], // size of the shadow
+				//iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
+				//shadowAnchor: [4, 62],  // the same for the shadow
+				//popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+			});	
 			
 			/*
 	      	// Poner un marcador en el mapa
@@ -115,7 +131,8 @@
 			  	var xmlDoc = xml.responseXML;
 				creador(xmlDoc);
 				buscaEstadisticas(xmlDoc);
-				var ruta = cargaRuta(xmlDoc);
+				cargaRuta(xmlDoc);
+				console.log(ruta);
 				dibujaRuta(ruta);
 				wayPoints(xmlDoc);
 		    }
@@ -161,7 +178,7 @@
 				    var arraytemp = [x[i].attributes['lat'].value, x[i].attributes['lon'].value]
 				    latlang.push(arraytemp);
 				}
-				return latlang;
+				ruta= latlang;
 			}
 
 			function dibujaRuta(ruta){
@@ -184,11 +201,18 @@
 				// Dibuja los WP en el mapa
 				var x=xmlDoc.getElementsByTagName("wpt");
 				for(i=0;i<x.length;i++){
-					var nombre = x[i].getElementsByTagName('name')[0].textContent;
-					var arraytemp = [x[i].attributes['lat'].value, x[i].attributes['lon'].value,x[i]];
-					L.marker(arraytemp,{icon:iMarcador}).addTo(grupoCapas)
-						.bindPopup(nombre)
-						.openPopup();
+					try{
+						var tipo = x[i].getElementsByTagName('type')[0].textContent;
+					} catch {
+						tipo='';
+					}
+					if (tipo != 'Comienzo' && tipo != 'Final'){
+						var nombre = x[i].getElementsByTagName('name')[0].textContent;
+						var arraytemp = [x[i].attributes['lat'].value, x[i].attributes['lon'].value,x[i]];
+						L.marker(arraytemp,{icon:iWayPoint}).addTo(grupoCapas)
+							.bindPopup(nombre)
+							.openPopup();
+					}
 				}
 			}
 		</script>
