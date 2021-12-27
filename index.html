@@ -27,8 +27,8 @@
 				<div class="col-sm-10" id="map" ></div>
 				<div class="col-sm-2" id="info"></div>	
 			</div>
-			<div class="row" style="margin-left: 0px;">
-				<div class="col-sm-10" id="grafica"></div>
+			<div class="row" style="height: 25vh;margin-left: 0px;">
+				<div class="col-sm-10" style="height: 25vh;" id="grafica"></div>
 			</div>
 		</div>
 		<script>
@@ -179,10 +179,10 @@
 			  	for (i=0;i<x.length;i++){     
 				    var arraytemp = [x[i].attributes['lat'].value, x[i].attributes['lon'].value]
 				    latlang.push(arraytemp);
-					//if (i%10 == 0){
+					if (i%50 == 0){
 						elevacionY.push(x[i].getElementsByTagName('ele')[0].textContent);
 						elevacionX.push(i);
-					//}
+					}
 				}
 				ruta= latlang;
 			}
@@ -224,11 +224,12 @@
 
 			function graficaElevacion(elevacion){
 				var grafica1={
-					x: elevacionX,
+					//x: elevacionX,
 					y: elevacionY,
 					type: 'scatter'
 				}
 				var data=[grafica1];
+				/*
 				var layout = {
 					title: 'Sales Growth',
 					xaxis: {
@@ -241,8 +242,26 @@
 						showline: false
 					}
 				};
+				*/
+				var layout = {
+					autosize: false,
+					width: 1551,
+					height: 200,
+					
+					margin: {
+					l: 0,
+					r: 0,
+					b: 0,
+					t: 0,
+					pad: 4
+					},
+										//paper_bgcolor: '#7f7f7f',
+					//plot_bgcolor: '#c7c7c7'
+				};
+
 				console.log(data);
-				Plotly.newPlot('grafica', data,layout);
+				Plotly.newPlot('grafica', data,layout, {displayModeBar: false});
+				//Plotly.newPlot('grafica', data);
 			}
 		</script>
 	</body>
