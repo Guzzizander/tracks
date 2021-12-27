@@ -16,22 +16,34 @@
 		<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />		
 	</head>
 	<body>
+		<!-- Fixed navbar -->
+		<nav class="navbar navbar-default navbar-fixed-top" style="padding-left: 12px;padding-right: 12px;">
+			<ul class="nav nav-pills nav-fill">
+				<li class="nav-item">
+					<input id="file-input" size="20" type="file" class="btn btn-primary btn-sm">
+				</li>
+			</ul>
+			<ul class="nav justify-content-end">
+				<li class="nav-item">
+					<div class="text-end" id="creador" style="padding-right: 0px;"></div>
+				</li>
+			</ul>
+	  	</nav>
 		<div class="container-fluid" >
-			<div class="row" style="margin-top: 05px;padding-top: 5px;padding-bottom: 5px;margin-bottom: 5px;">
-				<div class="col-sm-7" id="menu">
-					<input id="file-input" size="20" type="file"></div>
-				<div class="col-sm-3 text-end" id="creador" style="padding-right: 0px;"></div>
-				<div class="col-sm-2 text-center" id="tituloInfo" style="padding-right: 0px;"></div>
+			<div class="row" style="margin-left: 0px; padding-left: 12px;padding-right: 12px;">
+				<div class="col-sm-10" id="map" style="height: 75vh;"></div>
+				<div class="col-sm-2" id="colInfo">
+					<div class="row"></div>
+						<div style="height: 5vh; margin-left: 5px; font-weight: bold;" id="tituloInfo"></div>
+					<div class="row" id="info" style="margin-left: 5px"></div>
+				</div>	
 			</div>
-			<div class="row" style="height: 75vh;margin-left: 0px;">
-				<div class="col-sm-10" id="map" ></div>
-				<div class="col-sm-2" id="info"></div>	
-			</div>
-			<div class="row" style="height: 25vh;margin-left: 0px;">
-				<div class="col-sm-10" style="height: 25vh;" id="grafica"></div>
+			<div class="row" style="margin-left: 0px;">
+				<div class="col-sm-12" id="grafica"></div>
 			</div>
 		</div>
 		<script>
+			// Variables globales
 		    var nombre='';
 		    var xml = new XMLHttpRequest();
 			var ruta=[];
@@ -45,9 +57,28 @@
 			L.control.scale({imperial:false}).addTo(map);
 			var grupoCapas = L.layerGroup().addTo(map);
 			var marcadorPosicion = L.layerGroup().addTo(map);
-	      	
+			var iconosSize=[25,41];	     
+			// FIN Varianbles locales 	
+			
+			// Eventos
+			map.on('click', onMapClick);
+
+/*
+			var button = document.getElementById("file-input");
+			button.addEventListener('click', leerArchivo, false);
+
+			button.onclick = function(){
+				console.log(this.id+": Clicked!");
+				leerArchivo();
+			}
+*/
+
+			document.getElementById('file-input')
+			.addEventListener('change', leerArchivo, false);	
+
+			// FIN Eventos
+
 			// Creo los iconos
-			var iconosSize=[25,41];
 			var iSalida = L.icon({
 				iconUrl: 'images/start.png',
 				//  shadowUrl: 'leaf-shadow.png',
@@ -88,7 +119,8 @@
 				//shadowAnchor: [4, 62],  // the same for the shadow
 				//popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
 			});	
-			
+			// FIN Creo los iconos
+
 			/*
 	      	// Poner un marcador en el mapa
 	      	L.marker([41.124302580367235, 1.2385328405983511]).addTo(map)
@@ -96,90 +128,83 @@
 				    .openPopup();
 			*/
 
-			// Eventos
-			map.on('click', onMapClick);
-
-		    document.getElementById('file-input')
-		      .addEventListener('change', leerArchivo, false);			
-
-			function onMapClick(e) {
+			//Funciones
+			function onMapClick(e) { // Dibuja un marker en la posicion clickada
 				marcadorPosicion.clearLayers();
-			    var posicionMarcador = e.latlng;
+				var posicionMarcador = e.latlng;
 				var posicionMarcadorTxt = e.latlng.lat+', '+e.latlng.lng;
 				L.marker(posicionMarcador,{icon: iMarcador}).addTo(marcadorPosicion)
 					.bindPopup(posicionMarcadorTxt)
 					.openPopup();
-				/*
-				var posicion = 'Posición: '+e.latlng.lat+', '+e.latlng.lng;
-				document.getElementById("latLang").innerHTML=posicion;
-				*/
 			}
 
-	        function leerArchivo(e) {
-		        var archivo = e.target.files[0];
-		        if (!archivo) {
-		          return;
-		        }
-		        nombre=archivo.name;
-		        nombre = "tracks/"+nombre;
-		        loadDoc(nombre);
-		    }
+			function leerArchivo(e) { // Abre el selector de ficheros para cargar la ruta
+				var archivo = e.target.files[0];
+				if (!archivo) {
+				return;
+				}
+				nombre=archivo.name;
+				nombre = "tracks/"+nombre;
+				loadDoc(nombre);
+			}
 
-		    function loadDoc(nombre){
-	      		xml.open("GET", nombre, false);
-		      	xml.send();
-		    
-			  	var xmlDoc = xml.responseXML;
-				creador(xmlDoc);
-				buscaEstadisticas(xmlDoc);
-				cargaRuta(xmlDoc);
-				dibujaRuta(ruta);
-				wayPoints(xmlDoc);
-				graficaElevacion();
-		    }
+			function loadDoc(nombre){ // Abre el fichero de la ruta seleccionada
+				xml.open("GET", nombre, false);
+				xml.send();
+			
+				var xmlDoc = xml.responseXML;
+				creador(xmlDoc); 				// Busca el creador de la ruta
+				buscaEstadisticas(xmlDoc);		// Busca las estadisticas de la ruta
+				cargaRuta(xmlDoc);				// Crea los arrays con los datos de la ruta
+				dibujaRuta(ruta);				// Dibuja la ruta en el mapa
+				wayPoints(xmlDoc);				// Dubuja los waypoints en el mapa
+				graficaElevacion();				// Dibuja la grafica del perfil de la ruta
+			}
 
-		    function clearMap() {
-		   		grupoCapas.clearLayers();
-			    for(i in map._layers) {
-			        if(map._layers[i]._path != undefined) {
-			            try {
-			                map.removeLayer(map._layers[i]);
-			            }
-			            catch(e) {
-			                console.log("problem with " + e + map._layers[i]);
-			            }
-			        }
-			    }
+			function clearMap() { // Limpia el mapa de todos los elementos de la ruta anterior
+				grupoCapas.clearLayers();
+				for(i in map._layers) {
+					if(map._layers[i]._path != undefined) {
+						try {
+							map.removeLayer(map._layers[i]);
+						}
+						catch(e) {
+							console.log("problem with " + e + map._layers[i]);
+						}
+					}
+				}
 			}	
 		
-			function creador(xmlDoc){
-				// Mira el creador de la ruta
+			function creador(xmlDoc){ // Busca el creador de la ruta
 				var x = xmlDoc.getElementsByTagName("gpx"); 
 				var creador = x[0].attributes['creator'].value;
 				document.getElementById("creador").innerHTML="Creado por: "+creador;
 			}
 
-			function buscaEstadisticas(xmlDoc){
-				// Mira si hay estadisticas de la ruta
+			function buscaEstadisticas(xmlDoc){ // Busca las estadisticas de la ruta
+				var _info = document.getElementById('info');
+				var _tituloInfo = document.getElementById('tituloInfo');
 				try{
-				  	var x=xmlDoc.getElementsByTagName("desc");	  	
+					// Busca los tags "desc"
+					var x=xmlDoc.getElementsByTagName("desc");	  	
 					var info=x[1].childNodes[0].nodeValue;
-					document.getElementById('tituloInfo').innerHTML="Estadistica track";
-					document.getElementById('info').innerHTML='<FONT SIZE=2>'+info+'</font>';
+					_tituloInfo.innerHTML="Estadistica track";
+					_info.innerHTML='<FONT SIZE=2>'+info+'</font>';
 				} catch(e){
-					document.getElementById('tituloInfo').innerHTML='';
-					document.getElementById('info').innerHTML='';
+					// Si no los encuentra
+					_tituloInfo.innerHTML='';
+					_info.innerHTML='';
 				}	
 			}
 	
-			function cargaRuta(xmlDoc){
+			function cargaRuta(xmlDoc){	// Crea los arrays con los datos de la ruta
 				var x=xmlDoc.getElementsByTagName("trkpt");
-		    	var latlang = [];
+				var latlang = [];
 				var ele = [];
-			  	for (i=0;i<x.length;i++){     
-				    var arraytemp = [x[i].attributes['lat'].value, x[i].attributes['lon'].value]
-				    latlang.push(arraytemp);
-					if (i%50 == 0){
+				for (i=0;i<x.length;i++){     
+					var arraytemp = [x[i].attributes['lat'].value, x[i].attributes['lon'].value]
+					latlang.push(arraytemp);
+					if (i%60 == 0){ // Coge la elevación cada minuto
 						elevacionY.push(x[i].getElementsByTagName('ele')[0].textContent);
 						elevacionX.push(i);
 					}
@@ -187,24 +212,23 @@
 				ruta= latlang;
 			}
 
-			function dibujaRuta(ruta){
+			function dibujaRuta(ruta){  // Dibuja la ruta en el mapa
 				var salida = ruta[0];  
 				var llegada = ruta[ruta.length-1];  
-			  	clearMap();
+				clearMap();
 				// Mueve el mapa a la salida de la ruta
 				map.setView(salida, 12);
 				
 				// Dibuja la ruta
 				var polyLineOptions = {color:'red'};
-	        	var polyLine = L.polyline(ruta , polyLineOptions);
-	        	//polyLine.addTo(map);
-	        	polyLine.addTo(grupoCapas);
-	        	L.marker(salida, {icon: iSalida}).addTo(grupoCapas);
-	        	L.marker(llegada, {icon: iLlegada}).addTo(grupoCapas);	 
+				var polyLine = L.polyline(ruta , polyLineOptions);
+				//polyLine.addTo(map);
+				polyLine.addTo(grupoCapas);
+				L.marker(salida, {icon: iSalida}).addTo(grupoCapas);
+				L.marker(llegada, {icon: iLlegada}).addTo(grupoCapas);	 
 			}
 
-			function wayPoints(xmlDoc){
-				// Dibuja los WP en el mapa
+			function wayPoints(xmlDoc){ // Dubuja los waypoints en el mapa
 				var x=xmlDoc.getElementsByTagName("wpt");
 				for(i=0;i<x.length;i++){
 					try{
@@ -222,9 +246,9 @@
 				}
 			}
 
-			function graficaElevacion(elevacion){
+			function graficaElevacion(elevacion){ // Dibuja la grafica del perfil de la ruta
 				var grafica1={
-					//x: elevacionX,
+					x: elevacionX,
 					y: elevacionY,
 					type: 'scatter'
 				}
@@ -245,24 +269,25 @@
 				*/
 				var layout = {
 					autosize: false,
-					width: 1551,
-					height: 200,
+					width: 1896,
+					height: 250,
 					
 					margin: {
 					l: 0,
 					r: 0,
 					b: 0,
 					t: 0,
-					pad: 4
+					pad: 0
 					},
 										//paper_bgcolor: '#7f7f7f',
 					//plot_bgcolor: '#c7c7c7'
 				};
 
-				console.log(data);
+				//console.log(data);
 				Plotly.newPlot('grafica', data,layout, {displayModeBar: false});
 				//Plotly.newPlot('grafica', data);
 			}
+			//Funciones
 		</script>
 	</body>
 </html>
