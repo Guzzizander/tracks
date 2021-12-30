@@ -256,45 +256,63 @@
 				tag.remove();
 				parent.appendChild(para);
 
-	
-
-	var perfil = document.getElementById("perfil").getContext('2d');
-	perfil.canvas.width = screen.width;
-    perfil.canvas.height = 600;
-    var perfilRuta = new Chart(perfil, {
-        type: 'line',
-        data: {
-            labels:elevacionX,
-            datasets: [{
-                label: 'Perfil Ruta',
-                data: elevacionY,
-                lineTension: 0.3,
-                backgroundColor: "rgba(2,117,216,0.2)",
-                borderColor: "rgba(2,117,216,1)",
-                pointRadius: 0,
-                pointBackgroundColor: "rgba(2,117,216,1)",
-                pointBorderColor: "rgba(255,255,255,0.8)",
-                pointHoverRadius: 5,
-                pointHoverBackgroundColor: "rgba(2,117,216,1)",
-                pointHitRadius: 50,
-                pointBorderWidth: 2,
-                borderWidth: 1
-            }]
-        },
-		options: {
-            responsive: true,
-            title:{
-                display:true,
-                text:'Chart.js Line Chart - Logarithmic'
-            },
-            scales: {
-			    x: {
-			      display:false
-			    }
+				var perfil = document.getElementById("perfil").getContext('2d');
+				perfil.canvas.width = screen.width;
+				perfil.canvas.height = 200;
+				var perfilRuta = new Chart(perfil, {
+					type: 'line',
+					data: {
+						labels:elevacionX,
+						datasets: [{
+							label: 'Altura',
+							data: elevacionY,
+							fill : true,
+							lineTension: 0.3,
+							backgroundColor: "rgba(2,117,216,0.2)",
+							borderColor: "rgba(2,117,216,1)",
+							pointRadius: 0,
+							pointBackgroundColor: "rgba(2,117,216,1)",
+							pointBorderColor: "rgba(255,255,255,0.8)",
+							pointHoverRadius: 5,
+							pointHoverBackgroundColor: "rgba(2,117,216,1)",
+							pointHitRadius: 50,
+							pointBorderWidth: 2,
+							borderWidth: 1
+						}]
+					},
+					options: {
+						scales: {
+							xAxes: {
+								display: false,
+								scaleLabel: {
+								display: false,
+								labelString: 'Tiempo'
+								}
+							},
+							yAxes:{
+								display: true,
+								scaleLabel: {
+								display: true,
+								labelString: 'Elevacion'
+								}
+							}
+						},
+						tooltips: {
+							enabled: false,
+							mode: 'label',
+						},	
+						plugins: {
+							title: {
+								display: true,
+								text: 'Perfil Ruta',
+							},
+							legend: {
+								display: false
+							}
+						}
+					}
+				});
 			}
-        }
-	});
-}
 			//Funciones
 		</script>
 	</body>
