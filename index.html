@@ -59,7 +59,8 @@
 			L.control.scale({imperial:false}).addTo(map);
 			var grupoCapas = L.layerGroup().addTo(map);
 			var marcadorPosicion = L.layerGroup().addTo(map);
-			var iconosSize=[25,41];	     
+			var iconosSize=[25,41];	
+			var perfilRuta=null;     
 			// FIN Varianbles locales 	
 			
 			// Eventos
@@ -160,7 +161,22 @@
 				cargaRuta(xmlDoc);				// Crea los arrays con los datos de la ruta
 				dibujaRuta(ruta);				// Dibuja la ruta en el mapa
 				wayPoints(xmlDoc);				// Dubuja los waypoints en el mapa
+				if (perfilRuta != null){
+					// Borra los adtos anteriores
+
+					// Borra la grafica anterior
+					// Primero elimino el canvas
+					const para = document.createElement('canvas');
+					para.id = 'perfil';
+					var parent = document.getElementById('perfilRuta');
+					var tag = document.getElementById('perfil');
+					tag.remove();
+					perfilRuta.destroy();			// Borro la grafica anterior
+					parent.appendChild(para);		// Vuelvo a crear el canvas
+				}
+
 				graficaElevacion();				// Dibuja la grafica del perfil de la ruta
+
 			}
 
 			function clearMap() { // Limpia el mapa de todos los elementos de la ruta anterior
@@ -203,6 +219,9 @@
 				var x=xmlDoc.getElementsByTagName("trkpt");
 				var latlang = [];
 				var ele = [];
+				// Vacio los arrays de la grafica del perfil para evitar que las graficas se acumulen.
+				elevacionX=[];
+				elevacionY=[];
 				for (i=0;i<x.length;i++){     
 					var arraytemp = [x[i].attributes['lat'].value, x[i].attributes['lon'].value]
 					latlang.push(arraytemp);
@@ -210,7 +229,7 @@
 						elevacionY.push(x[i].getElementsByTagName('ele')[0].textContent);
 						elevacionX.push(i);
 					}
-				ruta= latlang;
+				ruta=latlang;
 			}
 
 			function dibujaRuta(ruta){  // Dibuja la ruta en el mapa
@@ -248,18 +267,31 @@
 			}
 
 			function graficaElevacion(){ 
-				// Borra la grafica anterior
+
+	/*			// Borra la grafica anterior
 				const para = document.createElement('canvas');
 				para.id = 'perfil';
 				var parent = document.getElementById('perfilRuta');
 				var tag = document.getElementById('perfil');
 				tag.remove();
+
+
+				if (perfilRuta != null){
+					alert("Borro el perfil");
+					console.log(perfilRuta);
+					perfilRuta.destroy();
+					console.log(perfilRuta);
+				}
+
+
+
 				parent.appendChild(para);
 
+*/
 				var perfil = document.getElementById("perfil").getContext('2d');
 				perfil.canvas.width = screen.width;
-				perfil.canvas.height = 200;
-				var perfilRuta = new Chart(perfil, {
+				perfil.canvas.height = 150;
+				perfilRuta = new Chart(perfil, {
 					type: 'line',
 					data: {
 						labels:elevacionX,
@@ -281,6 +313,9 @@
 						}]
 					},
 					options: {
+					    tooltips: {
+					         enabled: false
+					    },
 						scales: {
 							xAxes: {
 								display: false,
@@ -297,10 +332,6 @@
 								}
 							}
 						},
-						tooltips: {
-							enabled: false,
-							mode: 'label',
-						},	
 						plugins: {
 							title: {
 								display: true,
