@@ -12,10 +12,7 @@
     	<link rel="stylesheet" href="css/bootstrap.css" />
 		<script src="js/leaflet.js"></script>
     	<script src="js/bootstrap.js"></script>
-		<script src="js/plotly-2.8.3.min.js"></script>
-
-<script src="node_modules/chart.js/dist/chart.min.js"></script>
-
+		<script src="node_modules/chart.js/dist/chart.min.js"></script>
 
 		<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />		
 	</head>
@@ -213,7 +210,6 @@
 						elevacionY.push(x[i].getElementsByTagName('ele')[0].textContent);
 						elevacionX.push(i);
 					}
-				//}
 				ruta= latlang;
 			}
 
@@ -250,79 +246,18 @@
 					}
 				}
 			}
-/*
-			function graficaElevacion(elevacion){ // Dibuja la grafica del perfil de la ruta
-				var grafica1={
-					x: elevacionX,
-					y: elevacionY,
-					type: 'scatter'
-				}
-				var data=[grafica1];
-				/*
-				var layout = {
-					title: 'Sales Growth',
-					xaxis: {
-						title: 'Year',
-						showgrid: false,
-						zeroline: false
-					},
-					yaxis: {
-						title: 'Percent',
-						showline: false
-					}
-				};
-				var layout = {
-					autosize: false,
-					width: 1896,
-					height: 250,
-					
-					margin: {
-					l: 0,
-					r: 0,
-					b: 0,
-					t: 0,
-					pad: 0
-					},
-										//paper_bgcolor: '#7f7f7f',
-					//plot_bgcolor: '#c7c7c7'
-				};
 
-				//console.log(data);
-				Plotly.newPlot('grafica', data,layout, {displayModeBar: false});
-				//Plotly.newPlot('grafica', data);
-			}
-*/
-
-/*
-const config = {
-  type: 'line',
-  data: data,
-  options: {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'top',
-      },
-      title: {
-        display: true,
-        text: 'Chart.js Line Chart'
-      }
-    }
-  },
-};
-
-*/
-
-function graficaElevacion(){ 
-	// Borra la grafica anterior
-	const para = document.createElement('canvas');
-	para.id = 'perfil';
-	var parent = document.getElementById('perfilRuta');
-	var tag = document.getElementById('perfil');
-	tag.remove();
-	parent.appendChild(para);
+			function graficaElevacion(){ 
+				// Borra la grafica anterior
+				const para = document.createElement('canvas');
+				para.id = 'perfil';
+				var parent = document.getElementById('perfilRuta');
+				var tag = document.getElementById('perfil');
+				tag.remove();
+				parent.appendChild(para);
 
 	
+
 	var perfil = document.getElementById("perfil").getContext('2d');
 	perfil.canvas.width = screen.width;
     perfil.canvas.height = 600;
