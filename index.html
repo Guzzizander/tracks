@@ -23,10 +23,19 @@
 				<li class="nav-item">
 					<input id="file-input" size="20" type="file" class="btn btn-primary btn-sm">
 				</li>
-			</ul>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false" style="color:white">Mapas</a>
+					<ul class="dropdown-menu">
+					<li><a class="dropdown-item" id="OSM" href="#" onclick="cambiaMapa(this.id)">OpenStreetMaps</a></li>
+					<li><a class="dropdown-item" id="RasterICGC" onclick="cambiaMapa(this.id)" href="#">Raster ICGC</a></li>
+					</ul>
+				</li>
+				<li class="nav-item">
+					<div><p style="color:white" id="nombreMapa">Raster IGCC</p></div>
+				</li>
 			<ul class="nav justify-content-end">
 				<li class="nav-item">
-					<div class="text-end" id="creador" style="padding-right: 0px;"></div>
+					<div class="text-end" id="creador" style="color:white; padding-right: 0px;"></div>
 				</li>
 			</ul>
 	  	</nav>
@@ -52,12 +61,12 @@
 			var elevacionX=[];
 			var elevacionY=[];
 			var map = L.map('map').setView([41.125, 1.238], 10);
-		//	L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { // OpenStreetMaps Funciona
-			//L.tileLayer('https://geoserveis.icgc.cat/vector-tiles/contextmaps//{z}/{x}/{y}.pbf', { // No funciona
-			//L.tileLayer('http://geoserveis.icc.cat/icc_mapesmultibase/noutm/wmts/orto/GRID3857///{z}/{x}/{y}.jpeg',{  // Ortofoto ICGC Funciona
-			//L.tileLayer('https://geoserveis.icgc.cat/icc_fonstopografic/wms/service?REQUEST=GetMap&SERVICE=WMS&VERSION=1.1.1&LAYERS=mtc25msg&STYLES=&FORMAT=image/jpeg&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&SRS=EPSG:25831&BBOX=385233.979379834,4584558.12383376,388949.896618261,4587651.07847633&WIDTH=1020&HEIGHT=849 ',{ // Otro que no acaba de ir bien
-			//L.tileLayer('http://geoserveis.icc.cat/icc/_mapsmultibase/noutm/wmts/orto/GRID3857{z}/{x}/{y}.jpeg',{	 // Tampoco funciona
-			//L.tileLayer('https://geoserveis.icgc.at/map/bases_noutm/tiles/1.0.0/topo_EPSG3857//{z}/{x]/{y}.jpeg?origin=nw',{   // Tampoco funciona. Mapa en gris
+			// L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { // OpenStreetMaps Funciona
+			// L.tileLayer('https://geoserveis.icgc.cat/vector-tiles/contextmaps//{z}/{x}/{y}.pbf', { // No funciona
+			// L.tileLayer('http://geoserveis.icc.cat/icc_mapesmultibase/noutm/wmts/orto/GRID3857///{z}/{x}/{y}.jpeg',{  // Ortofoto ICGC Funciona
+			// L.tileLayer('https://geoserveis.icgc.cat/icc_fonstopografic/wms/service?REQUEST=GetMap&SERVICE=WMS&VERSION=1.1.1&LAYERS=mtc25msg&STYLES=&FORMAT=image/jpeg&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&SRS=EPSG:25831&BBOX=385233.979379834,4584558.12383376,388949.896618261,4587651.07847633&WIDTH=1020&HEIGHT=849 ',{ // Otro que no acaba de ir bien
+			// L.tileLayer('http://geoserveis.icc.cat/icc/_mapsmultibase/noutm/wmts/orto/GRID3857{z}/{x}/{y}.jpeg',{	 // Tampoco funciona
+			// L.tileLayer('https://geoserveis.icgc.at/map/bases_noutm/tiles/1.0.0/topo_EPSG3857//{z}/{x]/{y}.jpeg?origin=nw',{   // Tampoco funciona. Mapa en gris
 			L.tileLayer('https://geoserveis.icgc.cat/icc_mapesmultibase/noutm/wmts/topo/GRID3857/{z}/{x}/{y}.jpeg',{				
 				maxZoom: 18,
 			  //  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -139,6 +148,26 @@
 			*/
 
 			//Funciones
+
+			function cambiaMapa(mapa){
+				var OSM = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {id: 'MapOSM', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}),
+   					RasterICGC = L.tileLayer('https://geoserveis.icgc.cat/icc_mapesmultibase/noutm/wmts/topo/GRID3857/{z}/{x}/{y}.jpeg', {id: 'MapRasterICGC', attribution: '&copy; <a href="https://creativecommons.org/licenses/by/4.0/deed.ca">ICGC under CC BY 4.0</a> contributors'});
+				
+				OSM.addTo(map);
+				RasterICGC.addTo(map);	   
+
+				if (mapa == "OSM"){
+					document.getElementById('nombreMapa').innerHTML='OpenStreetMaps';
+					map.removeLayer(RasterICGC);
+					map.addLayer(OSM);
+				}
+				if (mapa == "RasterICGC"){
+					document.getElementById('nombreMapa').innerHTML='Raster ICGC';
+					map.removeLayer(OSM);
+					map.addLayer(RasterICGC);
+				}
+			}
+
 			function onMapClick(e) { // Dibuja un marker en la posicion clickada
 				marcadorPosicion.clearLayers();
 				var posicionMarcador = e.latlng;
