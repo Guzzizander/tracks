@@ -11,6 +11,7 @@
 		<link rel="stylesheet" href="css/mycss.css" />
     	<link rel="stylesheet" href="css/bootstrap.css" />
 		<script src="js/leaflet.js"></script>
+		<script src="js/tracks.js"></script>
     	<script src="js/bootstrap.js"></script>
 		<script src="node_modules/chart.js/dist/chart.min.js"></script>
 
@@ -23,25 +24,15 @@
 				<li class="nav-item">
 					<input id="file-input" size="20" type="file" class="btn btn-primary btn-sm">
 				</li>
-				<li class="nav-item dropdown">
-					<a id ="nombreMapa" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false" style="color:white">Raster IGCC</a>
-					<ul class="dropdown-menu">
-						<li><a class="dropdown-item" id="RasterIGN" href="#" onclick="cambiaMapa(this.id)">Raster IGN</a></li>
-						<li><a class="dropdown-item" id="BaseIGN" href="#" onclick="cambiaMapa(this.id)">IGN Base</a></li>
-						<li><a class="dropdown-item" id="RasterICGC" onclick="cambiaMapa(this.id)" href="#">Raster ICGC</a></li>
-						<li><a class="dropdown-item" id="OSM" onclick="cambiaMapa(this.id)" href="#">OpenStreetMaps</a></li>
-					</ul>
-				</li>
-			<ul class="nav justify-content-end">
-				<li class="nav-item">
-					<div class="text-end" id="creador" style="color:white; padding-right: 0px;"></div>
-				</li>
+			</ul>
+			<ul class="nav nav_pills nav_fill justify-content-end">
+				<div class="text-end" id="creador" style="color:white; padding-right: 0px;"></div>
 			</ul>
 	  	</nav>
 		<div class="container-fluid">
 			<div class="row" style="margin-left: 0px; padding-left: 12px;padding-right: 12px;">
 				<div class="col-sm-10" id="map" style="margin-top: 60px; height: 75vh;"></div>
-				<div class="col-sm-2" id="colInfo">
+				<div class="col-sm-2" id="colInfo" style="margin-top: 60px; height: 75vh;">
 					<div class="row"></div>
 						<div style="height: 5vh; margin-left: 5px; font-weight: bold;" id="tituloInfo"></div>
 					<div class="row" id="info" style="margin-left: 5px"></div>
@@ -56,24 +47,35 @@
 			// Variables globales
 		    var nombre='';
 		    var xml = new XMLHttpRequest();
+			// FIN Variables locales 	
+
+			// Definicion mapa Leaflet		
+			var map = L.map('map',{
+				zoomControl:true,
+				maxZoom:20,
+				layers:[RasterIGN]
+				}).setView([41.125, 1.238], 10);
+
+			var baselayers = {
+				"Orotofoto IGN": OrtofotoIGN,
+				"Raster IGN": RasterIGN,
+				"IGN Base": BaseIGN,
+				"Raster ICGC": RasterICGC,
+				"OpenStreetMaps": OSM
+			};
+
+			L.control.layers(baselayers).addTo(map);
+			L.control.scale({imperial:false}).addTo(map);
+
 			var ruta=[];
 			var elevacionX=[];
 			var elevacionY=[];
-			var map = L.map('map').setView([41.125, 1.238], 10);
-			L.tileLayer.wms('http://www.ign.es/wms-inspire/mapa-raster', {
-				layers: 'mtn_rasterizado',
-				format: 'image/png',
-				transparent: false,
-				continuousWorld : true,
-				attribution: '© <a href="http://www.ign.es/ign/main/index.do" target="_blank">Instituto Geográfico Nacional de España</a>'
-			}).addTo(map);
-
-			L.control.scale({imperial:false}).addTo(map);
 			var grupoCapas = L.layerGroup().addTo(map);
 			var marcadorPosicion = L.layerGroup().addTo(map);
 			var iconosSize=[25,41];	
-			var perfilRuta=null;     
-			// FIN Varianbles locales 	
+			var perfilRuta=null;
+
+			// FIN Definicion mapa Leaflet
 			
 			// Eventos
 			map.on('click', onMapClick);
@@ -90,7 +92,6 @@
 
 			document.getElementById('file-input')
 			.addEventListener('change', leerArchivo, false);	
-
 			// FIN Eventos
 
 			// Creo los iconos
@@ -144,77 +145,6 @@
 			*/
 
 			//Funciones
-			function cambiaMapa(mapa){
-				// Creo un array para guardar las layers para poder borrarlas luego
-				var layers = [];
-				var OSM = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-					id: 'MapOSM', 
-					attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-				});
-				layers.push(OSM);
-   				var	RasterICGC = L.tileLayer('https://geoserveis.icgc.cat/icc_mapesmultibase/noutm/wmts/topo/GRID3857/{z}/{x}/{y}.jpeg', {
-					id: 'MapRasterICGC', 
-					attribution: '&copy; <a href="https://creativecommons.org/licenses/by/4.0/deed.ca">ICGC under CC BY 4.0</a> contributors'
-				});
-				layers.push(RasterICGC);
-				var RasterIGN = L.tileLayer.wms('http://www.ign.es/wms-inspire/mapa-raster', {
-					layers: 'mtn_rasterizado',
-					format: 'image/png',
-					transparent: false,
-					continuousWorld : true,
-					attribution: '© <a href="http://www.ign.es/ign/main/index.do" target="_blank">Instituto Geográfico Nacional de España</a>'
-				});
-				layers.push(RasterIGN);
-
-				var BaseIGN=L.tileLayer.wms('http://www.ign.es/wms-inspire/ign-base', {
-					layers: 'IGNBaseTodo',
-					format: 'image/png',
-					transparent: false,
-					continuousWorld : true,
-					attribution: '© <a href="http://www.ign.es/ign/main/index.do" target="_blank">Instituto Geográfico Nacional de España</a>'
-				});
-				layers.push=(BaseIGN);
-
-				for(i=0;i<layers.length;i++){
-					map.removeLayer(layers[i]);
-				}
-/*
-				if (mapa == "OSM"){
-					document.getElementById('nombreMapa').innerHTML='OpenStreetMaps';
-					map.addLayer(OSM);
-				}
-				if (mapa == "RasterICGC"){
-					document.getElementById('nombreMapa').innerHTML='Raster ICGC';
-					map.addLayer(RasterICGC);
-				}
-				if (mapa == "RasterIGN"){
-					document.getElementById('nombreMapa').innerHTML='Raster IGN';
-					map.addLayer(RasterIGN);
-				}
-*/
-				switch (mapa){
-					case 'OSM':
-						document.getElementById('nombreMapa').innerHTML='OpenStreetMaps';
-						map.addLayer(OSM);
-						break;
-					case 'RasterICGC':
-						document.getElementById('nombreMapa').innerHTML='Raster ICGC';
-						map.addLayer(RasterICGC);
-						break;
-					case 'RasterIGN':
-						document.getElementById('nombreMapa').innerHTML='Raster IGN';
-						map.addLayer(RasterIGN);
-						break;
-					case 'BaseIGN':
-					document.getElementById('nombreMapa').innerHTML='IGN Base';
-						map.addLayer(BaseIGN);
-						break;
-
-				}
-
-
-			}
-
 			function onMapClick(e) { // Dibuja un marker en la posicion clickada
 				marcadorPosicion.clearLayers();
 				var posicionMarcador = e.latlng;
@@ -350,27 +280,6 @@
 			}
 
 			function graficaElevacion(){ 
-
-	/*			// Borra la grafica anterior
-				const para = document.createElement('canvas');
-				para.id = 'perfil';
-				var parent = document.getElementById('perfilRuta');
-				var tag = document.getElementById('perfil');
-				tag.remove();
-
-
-				if (perfilRuta != null){
-					alert("Borro el perfil");
-					console.log(perfilRuta);
-					perfilRuta.destroy();
-					console.log(perfilRuta);
-				}
-
-
-
-				parent.appendChild(para);
-
-*/
 				var perfil = document.getElementById("perfil").getContext('2d');
 				perfil.canvas.width = screen.width;
 				perfil.canvas.height = 150;
