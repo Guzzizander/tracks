@@ -96,7 +96,7 @@
 
 			// Creo los iconos
 			var iSalida = L.icon({
-				iconUrl: 'images/start.png',
+				iconUrl: 'css/images/start.png',
 				//  shadowUrl: 'leaf-shadow.png',
 
 				iconSize:     iconosSize, // size of the icon
@@ -107,7 +107,7 @@
 			});
 
 			var iLlegada = L.icon({
-				iconUrl: 'images/racing-flag.png',
+				iconUrl: 'css/images/racing-flag.png',
 				//  shadowUrl: 'leaf-shadow.png',
 				iconSize:    iconosSize, // size of the icon
 				//shadowSize:   [50, 64], // size of the shadow
@@ -117,7 +117,7 @@
 			});
 
 			var iMarcador = L.icon({
-				iconUrl: 'images/marker-icon.png',
+				iconUrl: 'css/images/marker-icon.png',
 				//  shadowUrl: 'leaf-shadow.png',
 				//iconSize:    iconosSize, // size of the icon
 				//shadowSize:   [50, 64], // size of the shadow
@@ -185,12 +185,13 @@
 					
 					// Primero elimino el canvas
 					const para = document.createElement('canvasPerfil');
-					para.id = 'canvasPerfil';
-					var parent = document.getElementById('canvasPerfil');
+					//para.id = 'canvasPerfil';
+					var parent = document.getElementById('divPerfil');
 					perfilElevacion.destroy();		// Borro la grafica anterior					
-					var tag = document.getElementById('divPerfil');
+					var tag = document.getElementById(para.id);
 					tag.remove();		// Borro el canvas
 					parent.appendChild(para);		// Vuelvo a crear el canvas
+					
 				}				
 			}
 
@@ -289,7 +290,6 @@
 					type: 'line',
 					data: {
 						labels:elevacionX,
-						/*
 						datasets: [{
 							label: 'Altura',
 							data: elevacionY,
@@ -306,9 +306,7 @@
 							pointBorderWidth: 2,
 							borderWidth: 1
 						}]
-						*/
 					},
-					/*
 					options: {
 					    tooltips: {
 					         enabled: false
@@ -339,7 +337,6 @@
 							}
 						}
 					}
-					*/
 				});
 			}  // FIN graficaElevacion
 			//Funciones
