@@ -12,9 +12,13 @@
 		<link rel="stylesheet" href="css/Control.OSMGeocoder.css" />
 		<link rel="stylesheet" href="css/mycss.css" />
     	<link rel="stylesheet" href="css/bootstrap.css" />
+		<link rel="stylesheet" href="http://makinacorpus.github.io/Leaflet.FileLayer/Font-Awesome/css/font-awesome.min.css"
+    />
 		<script src="js/leaflet.js"></script>
 		<script src="js/leaflet.draw.js"></script>
 		<script src="js/Control.OSMGeocoder.js"></script>
+		<!-- <script src="js/leaflet.filelayer.js"></script> -->
+		<script src="node_modules/leaflet-filelayer/src/leaflet.filelayer.js"></script>
 		<script src="js/tracks.js"></script>
     	<script src="js/bootstrap.js"></script>
 		<script src="node_modules/chart.js/dist/chart.min.js"></script>
@@ -91,8 +95,23 @@
 			*/
 
 			// Geolocalizador
-			var osmGeocoder = new L.Control.OSMGeocoder();
+			var osmGeocoder = new L.Control.OSMGeocoder({
+            //collapsed: false,
+            //position: 'bottomright',
+            text: 'Buscar',
+			});
 			map.addControl(osmGeocoder);
+
+			// Filelayer. Carga rutas GeoJSON, JSON, GPX y KML 
+			var style = {color:'red', opacity: 1.0, fillOpacity: 1.0, weight: 2, clickable: false};
+			//L.Control.fileLayerLoad.LABEL = '<img class="icon" src="css/folder.svg" alt="file icon"/>';
+			L.Control.FileLayerLoad({
+				fitBounds: true,
+				layerOptions: {style: style,
+							pointToLayer: function (data, latlng) {
+								return L.circleMarker(latlng, {style: style});
+							}},
+			}).addTo(map);
 
 			var baselayers = {
 				"Orotofoto IGN": OrtofotoIGN,
