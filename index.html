@@ -9,10 +9,12 @@
     
 		<link rel="stylesheet" href="css/leaflet.css" />
 		<link rel="stylesheet" href="css/leaflet.draw.css" />
+		<link rel="stylesheet" href="css/Control.OSMGeocoder.css" />
 		<link rel="stylesheet" href="css/mycss.css" />
     	<link rel="stylesheet" href="css/bootstrap.css" />
 		<script src="js/leaflet.js"></script>
 		<script src="js/leaflet.draw.js"></script>
+		<script src="js/Control.OSMGeocoder.js"></script>
 		<script src="js/tracks.js"></script>
     	<script src="js/bootstrap.js"></script>
 		<script src="node_modules/chart.js/dist/chart.min.js"></script>
@@ -63,13 +65,14 @@
 			var elevacionY=[];
 			var capaRuta = L.layerGroup().addTo(map);
 			var capaIconos = L.layerGroup().addTo(map);
-			var marcadorPosicion = L.layerGroup().addTo(map);
+			var capaPosiciones = L.layerGroup().addTo(map);
 			var iconosSize=[25,41];	
 			var perfilElevacion=null;
 
-			// Controles para dibujar directamente en el mapa
-			// De momento no se usa
+
 			/*	
+			// Controles para dibujar directamente en el mapa
+			// De momento no se usa			
 			var drawnItems = new L.FeatureGroup();
         	map.addLayer(drawnItems);
 			
@@ -87,6 +90,10 @@
 			});
 			*/
 
+			// Geolocalizador
+			var osmGeocoder = new L.Control.OSMGeocoder();
+			map.addControl(osmGeocoder);
+
 			var baselayers = {
 				"Orotofoto IGN": OrtofotoIGN,
 				"Raster IGN": RasterIGN,
@@ -98,7 +105,8 @@
 
 			var overlays = {
 				"Ruta": capaRuta,
-				"Iconos": capaIconos
+				"Iconos": capaIconos,
+				"Posiciones":capaPosiciones
 			}
 
 			L.control.layers(baselayers,overlays).addTo(map);
@@ -141,10 +149,10 @@
 
 			//Funciones
 			function onMapClick(e) { // Dibuja un marker en la posicion clickada
-				marcadorPosicion.clearLayers();
+				//capaPosiciones.clearLayers();
 				var posicionMarcador = e.latlng;
 				var posicionMarcadorTxt = e.latlng.lat+', '+e.latlng.lng;
-				L.marker(posicionMarcador,{icon: iMarcador}).addTo(marcadorPosicion)
+				L.marker(posicionMarcador,{icon: iMarcador}).addTo(capaPosiciones)
 					.bindPopup(posicionMarcadorTxt)
 					.openPopup();
 			}
@@ -274,7 +282,7 @@
 					if (tipo != 'Comienzo' && tipo != 'Final'){
 						var nombre = x[i].getElementsByTagName('name')[0].textContent;
 						var arraytemp = [x[i].attributes['lat'].value, x[i].attributes['lon'].value,x[i]];
-						L.marker(arraytemp,{icon:iWayPoint}).addTo(grupoCapas)
+						L.marker(arraytemp,{icon:iWayPoint}).addTo(capaIconos)
 							.bindPopup(nombre)
 							.openPopup();
 					}
