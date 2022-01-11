@@ -31,3 +31,8 @@ var OrtofotoIGN = L.tileLayer.wms('http://www.ign.es/wms-inspire/pnoa-ma', {
     continuousWorld : true,
     attribution: '© <a href="http://www.ign.es/ign/main/index.do" target="_blank">Instituto Geográfico Nacional de España</a>'
 });
+
+var otmUrl = L.tileLayer('http://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',{
+    continuousWorld : true,
+    attribution : "<a href='http://opentopomap.org/'>OpenTopoMap</a>"
+});

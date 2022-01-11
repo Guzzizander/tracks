@@ -56,39 +56,35 @@
 				layers:[RasterIGN]
 				}).setView([41.125, 1.238], 10);
 
+			var ruta=[];
+			var elevacionX=[];
+			var elevacionY=[];
+			var capaRuta = L.layerGroup().addTo(map);
+			var capaIconos = L.layerGroup().addTo(map);
+			var marcadorPosicion = L.layerGroup().addTo(map);
+			var iconosSize=[25,41];	
+			var perfilElevacion=null;
+
 			var baselayers = {
 				"Orotofoto IGN": OrtofotoIGN,
 				"Raster IGN": RasterIGN,
 				"IGN Base": BaseIGN,
 				"Raster ICGC": RasterICGC,
-				"OpenStreetMaps": OSM
+				"OpenStreetMaps": OSM,
+				"OpenTopomap" : otmUrl
 			};
 
-			L.control.layers(baselayers).addTo(map);
+			var overlays = {
+				"Ruta": capaRuta,
+				"Iconos": capaIconos
+			}
+
+			L.control.layers(baselayers,overlays).addTo(map);
 			L.control.scale({imperial:false}).addTo(map);
-
-			var ruta=[];
-			var elevacionX=[];
-			var elevacionY=[];
-			var grupoCapas = L.layerGroup().addTo(map);
-			var marcadorPosicion = L.layerGroup().addTo(map);
-			var iconosSize=[25,41];	
-			var perfilElevacion=null;
-
 			// FIN Definicion mapa Leaflet
 			
 			// Eventos
 			map.on('click', onMapClick);
-
-			/*
-			var button = document.getElementById("file-input");
-			button.addEventListener('click', leerArchivo, false);
-
-			button.onclick = function(){
-				console.log(this.id+": Clicked!");
-				leerArchivo();
-			}
-			*/
 
 			document.getElementById('file-input')
 				.addEventListener('change', leerArchivo, false);	
@@ -97,52 +93,29 @@
 			// Creo los iconos
 			var iSalida = L.icon({
 				iconUrl: 'css/images/start.png',
+				iconSize:     iconosSize, // size of the icon				
 				//  shadowUrl: 'leaf-shadow.png',
-
-				iconSize:     iconosSize, // size of the icon
 				//shadowSize:   [50, 64], // size of the shadow
 				//iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
 				//shadowAnchor: [4, 62],  // the same for the shadow
+				//  shadowUrl: 'leaf-shadow.png',
 				//popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
 			});
 
 			var iLlegada = L.icon({
 				iconUrl: 'css/images/racing-flag.png',
-				//  shadowUrl: 'leaf-shadow.png',
 				iconSize:    iconosSize, // size of the icon
-				//shadowSize:   [50, 64], // size of the shadow
-				//iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
-				//shadowAnchor: [4, 62],  // the same for the shadow
-				//popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
 			});
 
 			var iMarcador = L.icon({
 				iconUrl: 'css/images/marker-icon.png',
-				//  shadowUrl: 'leaf-shadow.png',
-				//iconSize:    iconosSize, // size of the icon
-				//shadowSize:   [50, 64], // size of the shadow
-				//iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
-				//shadowAnchor: [4, 62],  // the same for the shadow
-				//popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
 			});	
 			
 			var iWayPoint = L.icon({
 				iconUrl: 'images/gps.png',
-				//  shadowUrl: 'leaf-shadow.png',
 				iconSize:    iconosSize, // size of the icon
-				//shadowSize:   [50, 64], // size of the shadow
-				//iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
-				//shadowAnchor: [4, 62],  // the same for the shadow
-				//popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
 			});	
 			// FIN Creo los iconos
-
-			/*
-	      	// Poner un marcador en el mapa
-	      	L.marker([41.124302580367235, 1.2385328405983511]).addTo(map)
-				    .bindPopup('Hospital Universitario Joan XXIII.')
-				    .openPopup();
-			*/
 
 			//Funciones
 			function onMapClick(e) { // Dibuja un marker en la posicion clickada
@@ -196,7 +169,8 @@
 			}
 
 			function clearMap() { // Limpia el mapa de todos los elementos de la ruta anterior
-				grupoCapas.clearLayers();
+				capaRuta.clearLayers();
+				capaIconos.clearLayers();
 				for(i in map._layers) {
 					if(map._layers[i]._path != undefined) {
 						try {
@@ -256,12 +230,15 @@
 				map.setView(salida, 12);
 				
 				// Dibuja la ruta
-				var polyLineOptions = {color:'red'};
+				var polyLineOptions = {
+					color:'red',
+	                weight: 5
+				};
 				var polyLine = L.polyline(ruta , polyLineOptions);
 				//polyLine.addTo(map);
-				polyLine.addTo(grupoCapas);
-				L.marker(salida, {icon: iSalida}).addTo(grupoCapas);
-				L.marker(llegada, {icon: iLlegada}).addTo(grupoCapas);	 
+				polyLine.addTo(capaRuta);
+				L.marker(salida, {icon: iSalida}).addTo(capaIconos);
+				L.marker(llegada, {icon: iLlegada}).addTo(capaIconos);	 
 			}
 
 			function wayPoints(xmlDoc){ // Dubuja los waypoints en el mapa
