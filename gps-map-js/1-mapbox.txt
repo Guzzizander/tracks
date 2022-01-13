@@ -1,2 +1,0 @@
-Register an account at https://www.mapbox.com/
-Get your own access token
