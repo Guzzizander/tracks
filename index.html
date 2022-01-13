@@ -52,6 +52,11 @@
 			</div>
 		</div>
 		<script>
+			// Constantes configuracion modulos
+			const DRAW=false;
+			const GEOLOCALIZADOR=true;
+			const FILELAYER=false; 
+
 			// Variables globales
 		    var nombre='';
 		    var xml = new XMLHttpRequest();
@@ -74,44 +79,47 @@
 			var perfilElevacion=null;
 
 
-			/*	
 			// Controles para dibujar directamente en el mapa
-			// De momento no se usa			
-			var drawnItems = new L.FeatureGroup();
-        	map.addLayer(drawnItems);
-			
-			var drawControl = new L.Control.Draw({
-            edit: {
-                featureGroup: drawnItems
-				}
-			});
-			map.addControl(drawControl);
+			if (DRAW){
+				var drawnItems = new L.FeatureGroup();
+				map.addLayer(drawnItems);
+				
+				var drawControl = new L.Control.Draw({
+				edit: {
+					featureGroup: drawnItems
+					}
+				});
+				map.addControl(drawControl);
 
-			map.on('draw:created', function (e) {
-				var type = e.layerType,
-					layer = e.layer;
-				drawnItems.addLayer(layer);
-			});
-			*/
+				map.on('draw:created', function (e) {
+					var type = e.layerType,
+						layer = e.layer;
+					drawnItems.addLayer(layer);
+				});
+			}
 
 			// Geolocalizador
-			var osmGeocoder = new L.Control.OSMGeocoder({
-            //collapsed: false,
-            //position: 'bottomright',
-            text: 'Buscar',
-			});
-			map.addControl(osmGeocoder);
+			if (GEOLOCALIZADOR){
+				var osmGeocoder = new L.Control.OSMGeocoder({
+				//collapsed: false,
+				//position: 'bottomright',
+				text: 'Buscar',
+				});
+				map.addControl(osmGeocoder);
+			}
 
 			// Filelayer. Carga rutas GeoJSON, JSON, GPX y KML 
-			var style = {color:'red', opacity: 1.0, fillOpacity: 1.0, weight: 2, clickable: false};
-			//L.Control.fileLayerLoad.LABEL = '<img class="icon" src="css/folder.svg" alt="file icon"/>';
-			L.Control.FileLayerLoad({
-				fitBounds: true,
-				layerOptions: {style: style,
-							pointToLayer: function (data, latlng) {
-								return L.circleMarker(latlng, {style: style});
-							}},
-			}).addTo(map);
+			if (FILELAYER){
+				var style = {color:'red', opacity: 1.0, fillOpacity: 1.0, weight: 2, clickable: false};
+				L.Control.fileLayerLoad.LABEL = '<img class="icon" src="css/folder.svg" alt="file icon"/>';
+				L.Control.FileLayerLoad({
+					fitBounds: true,
+					layerOptions: {style: style,
+								pointToLayer: function (data, latlng) {
+									return L.circleMarker(latlng, {style: style});
+								}},
+				}).addTo(map);
+			}
 
 			var baselayers = {
 				"Orotofoto IGN": OrtofotoIGN,
