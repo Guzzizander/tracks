@@ -7,21 +7,35 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
     
-		<link rel="stylesheet" href="css/leaflet.css" />
+		<!-- <link rel="stylesheet" href="css/leaflet.css" /> -->
+
+		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+		integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+		crossorigin=""/>
+
+
+
 		<link rel="stylesheet" href="css/leaflet.draw.css" />
 		<link rel="stylesheet" href="css/Control.OSMGeocoder.css" />
 		<link rel="stylesheet" href="css/mycss.css" />
     	<link rel="stylesheet" href="css/bootstrap.css" />
-		<link rel="stylesheet" href="http://makinacorpus.github.io/Leaflet.FileLayer/Font-Awesome/css/font-awesome.min.css"
-    />
-		<script src="js/leaflet.js"></script>
-		<script src="js/leaflet.draw.js"></script>
+		<!-- <link rel="stylesheet" href="http://makinacorpus.github.io/Leaflet.FileLayer/Font-Awesome/css/font-awesome.min.css"
+    /> -->
+		<!-- <script src="js/leaflet.js"></script> -->
+
+
+		<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+		integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+		crossorigin=""></script>
+
+		<script src="https://unpkg.com/togeojson@0.16.0"></script>
+
+		<script src="https://unpkg.com/togeojson@0.16.0"></script>
+		
 		<script src="js/Control.OSMGeocoder.js"></script>
-		<!-- <script src="js/leaflet.filelayer.js"></script> -->
-		<script src="node_modules/leaflet-filelayer/src/leaflet.filelayer.js"></script>
 		<script src="js/tracks.js"></script>
     	<script src="js/bootstrap.js"></script>
-		<script src="node_modules/chart.js/dist/chart.min.js"></script>
+		<script src="js/chart.min.js"></script>
 
 		<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />		
 	</head>
@@ -55,7 +69,7 @@
 			// Constantes configuracion modulos
 			const DRAW=false;
 			const GEOLOCALIZADOR=true;
-			const FILELAYER=false; 
+			const FILELAYER=true;
 
 			// Variables globales
 		    var nombre='';
@@ -65,7 +79,7 @@
 			// Definicion mapa Leaflet		
 			var map = L.map('map',{
 				zoomControl:true,
-				maxZoom:20,
+				maxZoom:22,
 				layers:[RasterIGN]
 				}).setView([41.125, 1.238], 10);
 
@@ -111,7 +125,7 @@
 			// Filelayer. Carga rutas GeoJSON, JSON, GPX y KML 
 			if (FILELAYER){
 				var style = {color:'red', opacity: 1.0, fillOpacity: 1.0, weight: 2, clickable: false};
-				L.Control.fileLayerLoad.LABEL = '<img class="icon" src="css/folder.svg" alt="file icon"/>';
+			//	L.Control.fileLayerLoad.LABEL = '<img class="icon" src="css/images/folder.svg" alt="file icon"/>';
 				L.Control.FileLayerLoad({
 					fitBounds: true,
 					layerOptions: {style: style,

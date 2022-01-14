@@ -1,10 +1,15 @@
 var OSM = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    id: 'MapOSM', 
+    id: 'MapOSM',
+    maxZoom: 22,
+    maxNativeZoom: 19,
+    zoomDelta: 0.25, 
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 });
 
 var	RasterICGC = L.tileLayer('https://geoserveis.icgc.cat/icc_mapesmultibase/noutm/wmts/topo/GRID3857/{z}/{x}/{y}.jpeg', {
     id: 'MapRasterICGC', 
+    maxZoom: 22,
+    maxNativeZoom: 19,
     attribution: '&copy; <a href="https://creativecommons.org/licenses/by/4.0/deed.ca">ICGC under CC BY 4.0</a> contributors'
 });
 
@@ -13,6 +18,8 @@ var RasterIGN = L.tileLayer.wms('http://www.ign.es/wms-inspire/mapa-raster', {
     format: 'image/png',
     transparent: false,
     continuousWorld : true,
+    maxZoom: 22,
+    maxNativeZoom: 19,
     attribution: '© <a href="http://www.ign.es/ign/main/index.do" target="_blank">Instituto Geográfico Nacional de España</a>'
 });
 
