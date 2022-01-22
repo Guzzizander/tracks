@@ -291,7 +291,6 @@
 
         _initContainer: function () {
             var thisLoader = this.loader;
-
             // Create a button, and bind click on hidden file input
             var fileInput;
             var zoomName = 'leaflet-control-filelayer leaflet-control-zoom';
