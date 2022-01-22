@@ -10,33 +10,21 @@
 		<!-- <link rel="stylesheet" href="css/leaflet.css" /> -->
 
 		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-		integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
-		crossorigin=""/>
-
+			integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+			crossorigin=""/>
 		<link rel="stylesheet" href="css/leaflet.draw.css" />
 		<link rel="stylesheet" href="css/Control.OSMGeocoder.css" />
 		<link rel="stylesheet" href="css/mycss.css" />
     	<link rel="stylesheet" href="css/bootstrap.css" />
-		<!-- <link rel="stylesheet" href="http://makinacorpus.github.io/Leaflet.FileLayer/Font-Awesome/css/font-awesome.min.css"
-    /> -->
-		<!-- <script src="js/leaflet.js"></script> -->
-
 
 		<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
 		integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
 		crossorigin=""></script>
-
-		<script src="https://unpkg.com/togeojson@0.16.0"></script>
-
-		<script src="https://unpkg.com/togeojson@0.16.0"></script>
-		
 		<script src="js/Control.OSMGeocoder.js"></script>
 		<script src="js/tracks.js"></script>
     	<script src="js/bootstrap.js"></script>
 		<script src="js/chart.min.js"></script>
-
 		<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />	
-		
 		<style> 
 			.icon {
 				max-width: 70%;
@@ -44,7 +32,6 @@
 				margin: 4px;
 			}
 		</style> 
-
 	</head>
 	<body>
 		<!-- Fixed navbar -->
@@ -74,7 +61,6 @@
 			// Constantes configuracion modulos
 			const DRAW=false;
 			const GEOLOCALIZADOR=true;
-			const FILELAYER=false;
 			const CARGAFICHERO=true;
 
 			// Variables globales
@@ -145,35 +131,22 @@
 
 				function handleFiles() {
 					var fileList = this.files;
-					//console.log(fileList);
-					/* now you can work with the file list */
-
 					for (var i=0;i<fileList.length;i++){
-
 						var fileType = /gpx.*/;
 						var file = fileList[i];
 
 						if (!file.type.match(fileType)) {
 						continue;
 						}
-						/*		
-						// FUNCIONA
-						console.log(file);
-								fichero = 'tracks/'+file.name;
-						console.log(fichero);
-
-								// loadDoc(fichero);
-						*/
-						//console.log(file);
-						console.log(file.name);
 						document.getElementById('nombreFichero').innerHTML=file.name;
 						var reader = new FileReader();
 						reader.readAsText(file);
-						reader.onloadend = function(){
+						reader.onloadend = function(event){
+				layerswitcher.addOverlay(capaRuta,file.name);
 							var xmlData = reader.result;  // aqui esta el XML
 							if (typeof xmlData === 'string') {
 								xmlData = (new window.DOMParser()).parseFromString(xmlData, 'text/xml');
-            				}
+							}
 							leerXML(xmlData);
 						};
 					}
@@ -209,19 +182,6 @@
 				map.addControl(osmGeocoder);
 			}
 
-			// Filelayer. Carga rutas GeoJSON, JSON, GPX y KML 
-			if (FILELAYER){
-				var style = {color:'red', opacity: 1.0, fillOpacity: 1.0, weight: 2, clickable: false};
-			//	L.Control.fileLayerLoad.LABEL = '<img class="icon" src="css/images/folder.svg" alt="file icon"/>';
-				L.Control.FileLayerLoad({
-					fitBounds: true,
-					layerOptions: {style: style,
-								pointToLayer: function (data, latlng) {
-									return L.circleMarker(latlng, {style: style});
-								}},
-				}).addTo(map);
-			}
-
 			var baselayers = {
 				"Orotofoto IGN": OrtofotoIGN,
 				"Raster IGN": RasterIGN,
@@ -232,12 +192,12 @@
 			};
 
 			var overlays = {
-				"Ruta": capaRuta,
+			//	"Ruta": capaRuta,
 				"Iconos": capaIconos,
 				"Posiciones":capaPosiciones
 			}
 
-			L.control.layers(baselayers,overlays).addTo(map);
+			var layerswitcher=L.control.layers(baselayers,overlays).addTo(map);
 			L.control.scale({imperial:false}).addTo(map);
 			// FIN Definicion mapa Leaflet
 			
