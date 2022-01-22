@@ -13,8 +13,6 @@
 		integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
 		crossorigin=""/>
 
-
-
 		<link rel="stylesheet" href="css/leaflet.draw.css" />
 		<link rel="stylesheet" href="css/Control.OSMGeocoder.css" />
 		<link rel="stylesheet" href="css/mycss.css" />
@@ -37,15 +35,22 @@
     	<script src="js/bootstrap.js"></script>
 		<script src="js/chart.min.js"></script>
 
-		<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />		
+		<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />	
+		
+		<style> 
+			.icon {
+				max-width: 70%;
+				max-height: 70%;
+				margin: 4px;
+			}
+		</style> 
+
 	</head>
 	<body>
 		<!-- Fixed navbar -->
 		<nav class="navbar col-sm-12 navbar-default navbar-fixed-top" style="background-color: gray; padding-left: 12px;padding-right: 12px; z-index: 999; position: fixed !important">
-			<ul class="nav nav-pills nav-fill">
-				<li class="nav-item">
-					<input id="file-input" size="20" type="file" class="btn btn-primary btn-sm">
-				</li>
+			<ul class="nav nav-pills nav-fill justify-content-start">
+				<div class="text-end" id="nombreFichero" style="color:white; padding-right: 0px;">Hola Radiola</div>
 			</ul>
 			<ul class="nav nav_pills nav_fill justify-content-end">
 				<div class="text-end" id="creador" style="color:white; padding-right: 0px;"></div>
@@ -69,7 +74,8 @@
 			// Constantes configuracion modulos
 			const DRAW=false;
 			const GEOLOCALIZADOR=true;
-			const FILELAYER=true;
+			const FILELAYER=false;
+			const CARGAFICHERO=true;
 
 			// Variables globales
 		    var nombre='';
@@ -91,7 +97,83 @@
 			var capaPosiciones = L.layerGroup().addTo(map);
 			var iconosSize=[25,41];	
 			var perfilElevacion=null;
+			
+			if (CARGAFICHERO){
+			// Carga de fichero desde el icono					
+				var cargaFichero = L.control({
+					position: 'topright'
+				});
 
+				cargaFichero.onAdd = function(map) {
+					// var thisLoader = this.loader;   // NO FUNCIONA
+					// Creacion del boton y enlazarlo con in input-file oculto
+					var zoomName = 'leaflet-control';
+					var barName = 'leaflet-bar';
+					var partName = barName + '-part';
+					var container = L.DomUtil.create('div', zoomName + ' ' + barName);
+					var link = L.DomUtil.create('a', zoomName +' '+ partName, container);
+					//link.innerHTML = L.Control.FileLayerLoad.LABEL;
+					link.innerHTML = '<img class="icon" src="css/images/folder.svg" alt="file icon"/>';
+					link.href = '#';
+					//link.title = L.Control.FileLayerLoad.TITLE;
+					link.title = "Carga ficheros";
+
+					// Creacion del input-file oculto
+					fileInput=L.DomUtil.create('input','hidden',container);
+					fileInput.type='file';
+					fileInput.multiple='multiple';
+					fileInput.accept='.gpx';
+					fileInput.style.display='none';
+					// Cargar on file change
+					/*
+					fileInput.addEventListener('change',function(){
+						thisLoader.loadMultipe(this.files);
+						// reset para poder cargar el mismo fichero varias veces
+						this.value='';
+					}, false);
+					*/
+					L.DomEvent.disableClickPropagation(link);
+					L.DomEvent.on(link, 'click', function (e) {
+						fileInput.click();
+						e.preventDefault();
+					});					
+					return container;
+				}
+				cargaFichero.addTo(map);
+
+				fileInput.addEventListener("change", handleFiles, false);
+
+				function handleFiles() {
+					var fileList = this.files;
+					//console.log(fileList);
+					/* now you can work with the file list */
+
+					for (var i=0;i<fileList.length;i++){
+
+						var fileType = /gpx.*/;
+						var file = fileList[i];
+
+						if (!file.type.match(fileType)) {
+						continue;
+						}
+						/*		
+						// FUNCIONA
+						console.log(file);
+								fichero = 'tracks/'+file.name;
+						console.log(fichero);
+
+								// loadDoc(fichero);
+						*/
+						//console.log(file);
+						var reader = new FileReader();
+						reader.readAsText(file);
+						reader.onloadend = function(){
+							var xmlData = reader.result;
+							//console.log(xmlData);							
+						};
+					}
+				}
+			}
 
 			// Controles para dibujar directamente en el mapa
 			if (DRAW){
@@ -156,9 +238,6 @@
 			
 			// Eventos
 			map.on('click', onMapClick);
-
-			document.getElementById('file-input')
-				.addEventListener('change', leerArchivo, false);	
 			// FIN Eventos
 
 			// Creo los iconos
