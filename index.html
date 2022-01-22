@@ -50,7 +50,7 @@
 		<!-- Fixed navbar -->
 		<nav class="navbar col-sm-12 navbar-default navbar-fixed-top" style="background-color: gray; padding-left: 12px;padding-right: 12px; z-index: 999; position: fixed !important">
 			<ul class="nav nav-pills nav-fill justify-content-start">
-				<div class="text-end" id="nombreFichero" style="color:white; padding-right: 0px;">Hola Radiola</div>
+				<div class="text-end" id="nombreFichero" style="color:white; padding-right: 0px;"></div>
 			</ul>
 			<ul class="nav nav_pills nav_fill justify-content-end">
 				<div class="text-end" id="creador" style="color:white; padding-right: 0px;"></div>
@@ -165,11 +165,16 @@
 								// loadDoc(fichero);
 						*/
 						//console.log(file);
+						console.log(file.name);
+						document.getElementById('nombreFichero').innerHTML=file.name;
 						var reader = new FileReader();
 						reader.readAsText(file);
 						reader.onloadend = function(){
-							var xmlData = reader.result;
-							//console.log(xmlData);							
+							var xmlData = reader.result;  // aqui esta el XML
+							if (typeof xmlData === 'string') {
+								xmlData = (new window.DOMParser()).parseFromString(xmlData, 'text/xml');
+            				}
+							leerXML(xmlData);
 						};
 					}
 				}
@@ -277,21 +282,9 @@
 					.openPopup();
 			}
 
-			function leerArchivo(e) { // Abre el selector de ficheros para cargar la ruta
-				var archivo = e.target.files[0];
-				if (!archivo) {
-				return;
-				}
-				nombre=archivo.name;
-				nombre = "tracks/"+nombre;
-				loadDoc(nombre);
-			}
-
-			function loadDoc(nombre){ // Abre el fichero de la ruta seleccionada
-				xml.open("GET", nombre, false);
-				xml.send();
-			
-				var xmlDoc = xml.responseXML;
+			function leerXML(xml){ // Abre el fichero de la ruta seleccionada
+				var xmlDoc = xml;
+				//console.log(xmlDoc);
 				creador(xmlDoc); 				// Busca el creador de la ruta
 				buscaEstadisticas(xmlDoc);		// Busca las estadisticas de la ruta
 				cargaRuta(xmlDoc);				// Crea los arrays con los datos de la ruta
@@ -302,7 +295,7 @@
 
 			}
 
-			function borraPerfil(){				// Borra la grafica anterior
+			function borraPerfil(){				// Borra la grafica del perfil anterior
 				if (perfilElevacion != null){
 					console.log("Borrando grafica anterior");
 					
