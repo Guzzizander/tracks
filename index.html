@@ -83,7 +83,24 @@
 			var capaPosiciones = L.layerGroup().addTo(map);
 			var iconosSize=[25,41];	
 			var perfilElevacion=null;
+
+			var baselayers = {
+				"Orotofoto IGN": OrtofotoIGN,
+				"Raster IGN": RasterIGN,
+				"IGN Base": BaseIGN,
+				"Raster ICGC": RasterICGC,
+				"OpenStreetMaps": OSM,
+				"OpenTopomap" : otmUrl
+			};
+
+			var overlays = {
+				"Ruta": capaRuta,
+				"Iconos": capaIconos,
+				"Posiciones":capaPosiciones
+			}
 			
+			L.control.scale({imperial:false}).addTo(map);	
+
 			if (CARGAFICHERO){
 			// Carga de fichero desde el icono					
 				var cargaFichero = L.control({
@@ -142,7 +159,7 @@
 						var reader = new FileReader();
 						reader.readAsText(file);
 						reader.onloadend = function(event){
-				layerswitcher.addOverlay(capaRuta,file.name);
+
 							var xmlData = reader.result;  // aqui esta el XML
 							if (typeof xmlData === 'string') {
 								xmlData = (new window.DOMParser()).parseFromString(xmlData, 'text/xml');
@@ -182,23 +199,8 @@
 				map.addControl(osmGeocoder);
 			}
 
-			var baselayers = {
-				"Orotofoto IGN": OrtofotoIGN,
-				"Raster IGN": RasterIGN,
-				"IGN Base": BaseIGN,
-				"Raster ICGC": RasterICGC,
-				"OpenStreetMaps": OSM,
-				"OpenTopomap" : otmUrl
-			};
-
-			var overlays = {
-			//	"Ruta": capaRuta,
-				"Iconos": capaIconos,
-				"Posiciones":capaPosiciones
-			}
-
 			var layerswitcher=L.control.layers(baselayers,overlays).addTo(map);
-			L.control.scale({imperial:false}).addTo(map);
+
 			// FIN Definicion mapa Leaflet
 			
 			// Eventos
@@ -338,10 +340,23 @@
 	                weight: 5
 				};
 				var polyLine = L.polyline(ruta , polyLineOptions);
-				//polyLine.addTo(map);
+				
 				polyLine.addTo(capaRuta);
+
+				// Para poner la ruta en el desplegable de los oveerlays.
+				/*
+				var capa=capaRuta.addLayer(polyLine);
+				layerswitcher.addOverlay(capa,nombreFichero);
+				   console.log(capa._leaflet_id); 
+				   console.log(capa);
+
+				map.removeLayer(capa);  // Esto la hace no visible pero el overlay no se borra
+				*/
+
 				L.marker(salida, {icon: iSalida}).addTo(capaIconos);
 				L.marker(llegada, {icon: iLlegada}).addTo(capaIconos);	 
+
+				map.fitBounds(polyLine.getBounds());
 			}
 
 			function wayPoints(xmlDoc){ // Dubuja los waypoints en el mapa
