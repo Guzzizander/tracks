@@ -20,7 +20,9 @@
     border: 2px solid red;
 }
 
-.icon {
+.icono {
+    width: 44px;
+    height: 44px;
     max-width: 70%;
     max-height: 70%;
     margin: 4px;
