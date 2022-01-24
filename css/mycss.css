@@ -19,3 +19,17 @@
     padding: 20px;
     border: 2px solid red;
 }
+
+.icon {
+    max-width: 70%;
+    max-height: 70%;
+    margin: 4px;
+}
+
+.leaflet-control-load_files {
+	box-shadow: 0 1px 7px #999;
+	background: #f8f8f9;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+}
