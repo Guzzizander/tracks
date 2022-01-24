@@ -104,12 +104,13 @@
 					// var thisLoader = this.loader;   // NO FUNCIONA
 					// Creacion del boton y enlazarlo con in input-file oculto
 					var zoomName = 'leaflet-control';
-					var barName = 'leaflet-bar';
-					var partName = barName + '-part';
+					var barName = 'leaflet-control-load_files';
+					//var partName = barName + '-part';
 					var container = L.DomUtil.create('div', zoomName + ' ' + barName);
-					var link = L.DomUtil.create('a', zoomName +' '+ partName, container);
+					var link = L.DomUtil.create('a', zoomName +' '+ barName, container);
 					//link.innerHTML = L.Control.FileLayerLoad.LABEL;
-					link.innerHTML = '<img class="icon" src="css/images/folder.svg" alt="file icon"/>';
+					//link.innerHTML = '<img class="icono" src="css/images/folder.svg" alt="file icon"/>';
+					link.innerHTML = '<img src="css/images/folder.png" alt="file icon"/>';
 					link.href = '#';
 					//link.title = L.Control.FileLayerLoad.TITLE;
 					link.title = "Carga ficheros";
