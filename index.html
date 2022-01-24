@@ -104,10 +104,10 @@
 					// var thisLoader = this.loader;   // NO FUNCIONA
 					// Creacion del boton y enlazarlo con in input-file oculto
 					var zoomName = 'leaflet-control';
-					var barName = 'leaflet-control-load_files';
+					var barName = 'leaflet-control-geocoder';
 					//var partName = barName + '-part';
 					var container = L.DomUtil.create('div', zoomName + ' ' + barName);
-					var link = L.DomUtil.create('a', zoomName +' '+ barName, container);
+					var link = L.DomUtil.create('a', barName, container);
 					//link.innerHTML = L.Control.FileLayerLoad.LABEL;
 					//link.innerHTML = '<img class="icono" src="css/images/folder.svg" alt="file icon"/>';
 					link.innerHTML = '<img src="css/images/folder.png" alt="file icon"/>';
