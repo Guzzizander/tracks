@@ -105,8 +105,9 @@
 					// Creacion del boton y enlazarlo con in input-file oculto
 					var zoomName = 'leaflet-control';
 					var barName = 'leaflet-control-geocoder';
+					var test = 'leaflet-control-folder';
 					//var partName = barName + '-part';
-					var container = L.DomUtil.create('div', zoomName + ' ' + barName);
+					var container = L.DomUtil.create('div', zoomName + ' ' + barName + ' ' + test);
 					var link = L.DomUtil.create('a', barName, container);
 					//link.innerHTML = L.Control.FileLayerLoad.LABEL;
 					//link.innerHTML = '<img class="icono" src="css/images/folder.svg" alt="file icon"/>';
@@ -143,11 +144,15 @@
 				function handleFiles() {
 					var fileList = this.files;
 					for (var i=0;i<fileList.length;i++){
-						var fileType = /gpx.*/;
+						var fileTypes = ["gpx","kml"];
 						var file = fileList[i];
+						var fileType = getFileExtension(file.name);
 
-						if (!file.type.match(fileType)) {
-						continue;
+						//let incluyeVeinte = arreglo.includes(20);
+
+						if (!fileTypes.includes(fileType)) {
+							alert("Tipo de fichero no permitido");
+							continue;
 						}
 						document.getElementById('nombreFichero').innerHTML=file.name;
 						var reader = new FileReader();
@@ -229,6 +234,12 @@
 			// FIN Creo los iconos
 
 			//Funciones
+			function getFileExtension(filename) {
+				var fichero=filename;
+			  	return fichero.split('.').pop();
+			}
+
+
 			function onMapClick(e) { // Dibuja un marker en la posicion clickada
 				//capaPosiciones.clearLayers();
 				var posicionMarcador = e.latlng;
@@ -240,7 +251,7 @@
 
 			function leerXML(xml){ // Abre el fichero de la ruta seleccionada
 				var xmlDoc = xml;
-				//console.log(xmlDoc);
+				console.log(xmlDoc);
 				creador(xmlDoc); 				// Busca el creador de la ruta
 				buscaEstadisticas(xmlDoc);		// Busca las estadisticas de la ruta
 				cargaRuta(xmlDoc);				// Crea los arrays con los datos de la ruta

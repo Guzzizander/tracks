@@ -73,6 +73,7 @@
             }
 
             // Get parser for this data type
+            console.log('test');
             parser = this._getParser(file.name, ext);
             if (!parser) {
                 return false;

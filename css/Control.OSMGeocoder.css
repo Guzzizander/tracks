@@ -36,3 +36,14 @@
 .leaflet-control-geocoder-expanded .leaflet-control-geocoder-form {
 	padding: 5px;
 }
+
+.leaflet-control-folder a {
+	background-image: url(images/test.png) !important;
+	margin: auto;
+}
+.leaflet-control-folder img {
+	width: 80%;
+	padding-left: 5px;
+    padding-top: 7px;
+    margin-left: 2px;
+}
