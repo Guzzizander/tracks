@@ -73,7 +73,6 @@
             }
 
             // Get parser for this data type
-            console.log('test');
             parser = this._getParser(file.name, ext);
             if (!parser) {
                 return false;
@@ -208,6 +207,35 @@
             if (this.options.addToMap) {
                 layer.addTo(this._map);
             }
+
+//console.log(content);
+//console.log(content.features.length);
+console.log(content.features);
+//console.log(content.features[0].properties.desc);
+//console.log(content.features[1].properties.type);
+
+var _info = document.getElementById('info');
+var _tituloInfo = document.getElementById('tituloInfo');
+try{
+    _tituloInfo.innerHTML="Estadistica track";
+    _info.innerHTML='<FONT SIZE=2>'+content.features[0].properties.desc+'</font>';
+} catch(e){
+    // Si no los encuentra
+    _tituloInfo.innerHTML='';
+    _info.innerHTML='';
+}
+
+var regs = content.features.length;
+
+if (regs>1){
+    for (var i=1; i<regs;i++){
+        console.log(content.features[i].type);
+        console.log(content.features[i].properties.name);
+        //console.log(content.features[i].properties
+    }
+}
+
+
             return layer;
         },
 
@@ -218,6 +246,7 @@
                 content = (new window.DOMParser()).parseFromString(content, 'text/xml');
             }
             geojson = toGeoJSON[format](content);
+    
             return this._loadGeoJSON(geojson);
         }
     });
@@ -292,6 +321,7 @@
 
         _initContainer: function () {
             var thisLoader = this.loader;
+
             // Create a button, and bind click on hidden file input
             var fileInput;
             var zoomName = 'leaflet-control-filelayer leaflet-control-zoom';
