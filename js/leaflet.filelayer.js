@@ -216,15 +216,17 @@ console.log(content.features);
 
 var _info = document.getElementById('info');
 var _tituloInfo = document.getElementById('tituloInfo');
-try{
-    _tituloInfo.innerHTML="Estadistica track";
-    _info.innerHTML='<FONT SIZE=2>'+content.features[0].properties.desc+'</font>';
-} catch(e){
-    // Si no los encuentra
+var desc = content.features[0].properties.desc;
+
+if (typeof desc === 'undefined'){
+    // Si no hay descripcion
+    desc = '';
     _tituloInfo.innerHTML='';
     _info.innerHTML='';
+} else {
+        _tituloInfo.innerHTML="Estadistica track";
+        _info.innerHTML='<FONT SIZE=2>'+desc+'</font>';
 }
-
 var regs = content.features.length;
 
 if (regs>1){
