@@ -397,6 +397,7 @@ var toGeoJSON = (function() {
                 }
                 return prop;
             }
+            // console.log(gj);
             return gj;
         }
     };

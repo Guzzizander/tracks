@@ -7,31 +7,30 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
     
-		<link rel="stylesheet" href="css/leaflet.css" />
+		<!-- <link rel="stylesheet" href="css/leaflet.css" /> -->
+
+		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+			integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+			crossorigin=""/>
 		<link rel="stylesheet" href="css/leaflet.draw.css" />
 		<link rel="stylesheet" href="css/Control.OSMGeocoder.css" />
 		<link rel="stylesheet" href="css/mycss.css" />
     	<link rel="stylesheet" href="css/bootstrap.css" />
-		<link rel="stylesheet" href="http://makinacorpus.github.io/Leaflet.FileLayer/Font-Awesome/css/font-awesome.min.css"
-    />
-		<script src="js/leaflet.js"></script>
-		<script src="js/leaflet.draw.js"></script>
+
+		<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+		integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+		crossorigin=""></script>
 		<script src="js/Control.OSMGeocoder.js"></script>
-		<!-- <script src="js/leaflet.filelayer.js"></script> -->
-		<script src="node_modules/leaflet-filelayer/src/leaflet.filelayer.js"></script>
 		<script src="js/tracks.js"></script>
     	<script src="js/bootstrap.js"></script>
-		<script src="node_modules/chart.js/dist/chart.min.js"></script>
-
-		<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />		
+		<script src="js/chart.min.js"></script>
+		<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />	
 	</head>
 	<body>
 		<!-- Fixed navbar -->
 		<nav class="navbar col-sm-12 navbar-default navbar-fixed-top" style="background-color: gray; padding-left: 12px;padding-right: 12px; z-index: 999; position: fixed !important">
-			<ul class="nav nav-pills nav-fill">
-				<li class="nav-item">
-					<input id="file-input" size="20" type="file" class="btn btn-primary btn-sm">
-				</li>
+			<ul class="nav nav-pills nav-fill justify-content-start">
+				<div class="text-end" id="nombreFichero" style="color:white; padding-right: 0px;"></div>
 			</ul>
 			<ul class="nav nav_pills nav_fill justify-content-end">
 				<div class="text-end" id="creador" style="color:white; padding-right: 0px;"></div>
@@ -55,7 +54,7 @@
 			// Constantes configuracion modulos
 			const DRAW=false;
 			const GEOLOCALIZADOR=true;
-			const FILELAYER=false; 
+			const CARGAFICHERO=true;
 
 			// Variables globales
 		    var nombre='';
@@ -65,7 +64,7 @@
 			// Definicion mapa Leaflet		
 			var map = L.map('map',{
 				zoomControl:true,
-				maxZoom:20,
+				maxZoom:22,
 				layers:[RasterIGN]
 				}).setView([41.125, 1.238], 10);
 
@@ -78,6 +77,97 @@
 			var iconosSize=[25,41];	
 			var perfilElevacion=null;
 
+			var baselayers = {
+				"Orotofoto IGN": OrtofotoIGN,
+				"Raster IGN": RasterIGN,
+				"IGN Base": BaseIGN,
+				"Raster ICGC": RasterICGC,
+				"OpenStreetMaps": OSM,
+				"OpenTopomap" : otmUrl
+			};
+
+			var overlays = {
+				"Ruta": capaRuta,
+				"Iconos": capaIconos,
+				"Posiciones":capaPosiciones
+			}
+			
+			L.control.scale({imperial:false}).addTo(map);	
+
+			if (CARGAFICHERO){
+			// Carga de fichero desde el icono					
+				var cargaFichero = L.control({
+					position: 'topright'
+				});
+
+				cargaFichero.onAdd = function(map) {
+					// var thisLoader = this.loader;   // NO FUNCIONA
+					// Creacion del boton y enlazarlo con in input-file oculto
+					var zoomName = 'leaflet-control';
+					var barName = 'leaflet-control-geocoder';
+					var test = 'leaflet-control-folder';
+					//var partName = barName + '-part';
+					var container = L.DomUtil.create('div', zoomName + ' ' + barName + ' ' + test);
+					var link = L.DomUtil.create('a', barName, container);
+					//link.innerHTML = L.Control.FileLayerLoad.LABEL;
+					//link.innerHTML = '<img class="icono" src="css/images/folder.svg" alt="file icon"/>';
+					link.innerHTML = '<img src="css/images/folder.png" alt="file icon"/>';
+					link.href = '#';
+					//link.title = L.Control.FileLayerLoad.TITLE;
+					link.title = "Carga ficheros";
+
+					// Creacion del input-file oculto
+					fileInput=L.DomUtil.create('input','hidden',container);
+					fileInput.type='file';
+					fileInput.multiple='multiple';
+					fileInput.accept='.gpx';
+					fileInput.style.display='none';
+					// Cargar on file change
+					/*
+					fileInput.addEventListener('change',function(){
+						thisLoader.loadMultipe(this.files);
+						// reset para poder cargar el mismo fichero varias veces
+						this.value='';
+					}, false);
+					*/
+					L.DomEvent.disableClickPropagation(link);
+					L.DomEvent.on(link, 'click', function (e) {
+						fileInput.click();
+						e.preventDefault();
+					});					
+					return container;
+				}
+				cargaFichero.addTo(map);
+
+				fileInput.addEventListener("change", handleFiles, false);
+
+				function handleFiles() {
+					var fileList = this.files;
+					for (var i=0;i<fileList.length;i++){
+						var fileTypes = ["gpx","kml"];
+						var file = fileList[i];
+						var fileType = getFileExtension(file.name);
+
+						//let incluyeVeinte = arreglo.includes(20);
+
+						if (!fileTypes.includes(fileType)) {
+							alert("Tipo de fichero no permitido");
+							continue;
+						}
+						document.getElementById('nombreFichero').innerHTML=file.name;
+						var reader = new FileReader();
+						reader.readAsText(file);
+						reader.onloadend = function(event){
+
+							var xmlData = reader.result;  // aqui esta el XML
+							if (typeof xmlData === 'string') {
+								xmlData = (new window.DOMParser()).parseFromString(xmlData, 'text/xml');
+							}
+							leerXML(xmlData);
+						};
+					}
+				}
+			}
 
 			// Controles para dibujar directamente en el mapa
 			if (DRAW){
@@ -108,43 +198,12 @@
 				map.addControl(osmGeocoder);
 			}
 
-			// Filelayer. Carga rutas GeoJSON, JSON, GPX y KML 
-			if (FILELAYER){
-				var style = {color:'red', opacity: 1.0, fillOpacity: 1.0, weight: 2, clickable: false};
-				L.Control.fileLayerLoad.LABEL = '<img class="icon" src="css/folder.svg" alt="file icon"/>';
-				L.Control.FileLayerLoad({
-					fitBounds: true,
-					layerOptions: {style: style,
-								pointToLayer: function (data, latlng) {
-									return L.circleMarker(latlng, {style: style});
-								}},
-				}).addTo(map);
-			}
+			var layerswitcher=L.control.layers(baselayers,overlays).addTo(map);
 
-			var baselayers = {
-				"Orotofoto IGN": OrtofotoIGN,
-				"Raster IGN": RasterIGN,
-				"IGN Base": BaseIGN,
-				"Raster ICGC": RasterICGC,
-				"OpenStreetMaps": OSM,
-				"OpenTopomap" : otmUrl
-			};
-
-			var overlays = {
-				"Ruta": capaRuta,
-				"Iconos": capaIconos,
-				"Posiciones":capaPosiciones
-			}
-
-			L.control.layers(baselayers,overlays).addTo(map);
-			L.control.scale({imperial:false}).addTo(map);
 			// FIN Definicion mapa Leaflet
 			
 			// Eventos
 			map.on('click', onMapClick);
-
-			document.getElementById('file-input')
-				.addEventListener('change', leerArchivo, false);	
 			// FIN Eventos
 
 			// Creo los iconos
@@ -175,6 +234,12 @@
 			// FIN Creo los iconos
 
 			//Funciones
+			function getFileExtension(filename) {
+				var fichero=filename;
+			  	return fichero.split('.').pop();
+			}
+
+
 			function onMapClick(e) { // Dibuja un marker en la posicion clickada
 				//capaPosiciones.clearLayers();
 				var posicionMarcador = e.latlng;
@@ -184,21 +249,9 @@
 					.openPopup();
 			}
 
-			function leerArchivo(e) { // Abre el selector de ficheros para cargar la ruta
-				var archivo = e.target.files[0];
-				if (!archivo) {
-				return;
-				}
-				nombre=archivo.name;
-				nombre = "tracks/"+nombre;
-				loadDoc(nombre);
-			}
-
-			function loadDoc(nombre){ // Abre el fichero de la ruta seleccionada
-				xml.open("GET", nombre, false);
-				xml.send();
-			
-				var xmlDoc = xml.responseXML;
+			function leerXML(xml){ // Abre el fichero de la ruta seleccionada
+				var xmlDoc = xml;
+				console.log(xmlDoc);
 				creador(xmlDoc); 				// Busca el creador de la ruta
 				buscaEstadisticas(xmlDoc);		// Busca las estadisticas de la ruta
 				cargaRuta(xmlDoc);				// Crea los arrays con los datos de la ruta
@@ -209,7 +262,7 @@
 
 			}
 
-			function borraPerfil(){				// Borra la grafica anterior
+			function borraPerfil(){				// Borra la grafica del perfil anterior
 				if (perfilElevacion != null){
 					console.log("Borrando grafica anterior");
 					
@@ -292,10 +345,23 @@
 	                weight: 5
 				};
 				var polyLine = L.polyline(ruta , polyLineOptions);
-				//polyLine.addTo(map);
+				
 				polyLine.addTo(capaRuta);
+
+				// Para poner la ruta en el desplegable de los oveerlays.
+				/*
+				var capa=capaRuta.addLayer(polyLine);
+				layerswitcher.addOverlay(capa,nombreFichero);
+				   console.log(capa._leaflet_id); 
+				   console.log(capa);
+
+				map.removeLayer(capa);  // Esto la hace no visible pero el overlay no se borra
+				*/
+
 				L.marker(salida, {icon: iSalida}).addTo(capaIconos);
 				L.marker(llegada, {icon: iLlegada}).addTo(capaIconos);	 
+
+				map.fitBounds(polyLine.getBounds());
 			}
 
 			function wayPoints(xmlDoc){ // Dubuja los waypoints en el mapa

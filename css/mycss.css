@@ -19,3 +19,11 @@
     padding: 20px;
     border: 2px solid red;
 }
+
+.icono {
+    width: 44px;
+    height: 44px;
+    max-width: 70%;
+    max-height: 70%;
+    margin: 4px;
+}
