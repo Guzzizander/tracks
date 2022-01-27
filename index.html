@@ -85,86 +85,52 @@
 			};
 
 			var overlays = {
-				"Ruta": capaRuta,
-				"Iconos": capaIconos,
+				//"Ruta": capaRuta,
+				//"Iconos": capaIconos,
 				"Posiciones":capaPosiciones
 			}
 			
 			L.control.scale({imperial:false}).addTo(map);	
 
 			if (CARGAFICHERO){
-			// Carga de fichero desde el icono					
-				var cargaFichero = L.control({
-					position: 'topright'
+			// Carga de fichero desde el icono	
+				var style = {
+					color: 'red',
+					opacity: 1.0,
+					fillOpacity: 1.0,
+					weight: 2,
+					clickable: false
+				};
+				L.Control.FileLayerLoad.LABEL = '<img class="icon" src="css/images/folder.png" alt="file icon"/>';
+				var control = L.Control.fileLayerLoad({
+					fileSizeLimit: 2048,  //Comprobar si funciona. Por defecto 1024
+					layer: L.geoJson,
+					layerOptions: {
+							style: style,
+							pointToLayer: function (data, latlng) {
+								return L.circleMarker(
+									latlng,
+									{ style: style }
+								);
+							}
+						},
+					addToMap: true,
+					fileSizeLimit: 1024,
+					formats: [
+						'.geojson',
+						'.gpx',
+						'.kml'
+					]
+				}).addTo(map);
+				var layerswitcher= L.control.layers(baselayers, overlays,{collapsed:false}).addTo(map);
+			
+				control.loader.on('data:loaded', function (event) {   
+				layerswitcher.addOverlay(event.layer, event.filename);
 				});
 
-				cargaFichero.onAdd = function(map) {
-					// var thisLoader = this.loader;   // NO FUNCIONA
-					// Creacion del boton y enlazarlo con in input-file oculto
-					var zoomName = 'leaflet-control';
-					var barName = 'leaflet-control-geocoder';
-					var test = 'leaflet-control-folder';
-					//var partName = barName + '-part';
-					var container = L.DomUtil.create('div', zoomName + ' ' + barName + ' ' + test);
-					var link = L.DomUtil.create('a', barName, container);
-					//link.innerHTML = L.Control.FileLayerLoad.LABEL;
-					//link.innerHTML = '<img class="icono" src="css/images/folder.svg" alt="file icon"/>';
-					link.innerHTML = '<img src="css/images/folder.png" alt="file icon"/>';
-					link.href = '#';
-					//link.title = L.Control.FileLayerLoad.TITLE;
-					link.title = "Carga ficheros";
-
-					// Creacion del input-file oculto
-					fileInput=L.DomUtil.create('input','hidden',container);
-					fileInput.type='file';
-					fileInput.multiple='multiple';
-					fileInput.accept='.gpx';
-					fileInput.style.display='none';
-					// Cargar on file change
-					/*
-					fileInput.addEventListener('change',function(){
-						thisLoader.loadMultipe(this.files);
-						// reset para poder cargar el mismo fichero varias veces
-						this.value='';
-					}, false);
-					*/
-					L.DomEvent.disableClickPropagation(link);
-					L.DomEvent.on(link, 'click', function (e) {
-						fileInput.click();
-						e.preventDefault();
-					});					
-					return container;
-				}
-				cargaFichero.addTo(map);
-
-				fileInput.addEventListener("change", handleFiles, false);
-
-				function handleFiles() {
-					var fileList = this.files;
-					for (var i=0;i<fileList.length;i++){
-						var fileTypes = ["gpx","kml"];
-						var file = fileList[i];
-						var fileType = getFileExtension(file.name);
-
-						//let incluyeVeinte = arreglo.includes(20);
-
-						if (!fileTypes.includes(fileType)) {
-							alert("Tipo de fichero no permitido");
-							continue;
-						}
-						document.getElementById('nombreFichero').innerHTML=file.name;
-						var reader = new FileReader();
-						reader.readAsText(file);
-						reader.onloadend = function(event){
-
-							var xmlData = reader.result;  // aqui esta el XML
-							if (typeof xmlData === 'string') {
-								xmlData = (new window.DOMParser()).parseFromString(xmlData, 'text/xml');
-							}
-							leerXML(xmlData);
-						};
-					}
-				}
+				control.loader.on('data:error', function (error) {
+				alert(error.error.message);
+				});
 			}
 
 			// Controles para dibujar directamente en el mapa
@@ -195,9 +161,6 @@
 				});
 				map.addControl(osmGeocoder);
 			}
-
-			var layerswitcher=L.control.layers(baselayers,overlays).addTo(map);
-
 			// FIN Definicion mapa Leaflet
 			
 			// Eventos
