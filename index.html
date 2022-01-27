@@ -12,8 +12,24 @@
 		<link rel="stylesheet" href="css/leaflet.css"/>
 		<link rel="stylesheet" href="css/leaflet.draw.css" />
 		<link rel="stylesheet" href="css/Control.OSMGeocoder.css" />
-		<link rel="stylesheet" href="css/mycss.css" />
     	<link rel="stylesheet" href="css/bootstrap.css" />
+		<link rel="stylesheet" href="css/mycss.css" />
+
+		<style> 
+			.icon {
+				width: 44px;
+				height: 44px;
+				max-width: 70%;
+				max-height: 70%;
+				margin: 4px;
+				align-items: center
+			}
+			.leaflet-control-filelayer{
+				width: 44px;
+				height: 44px;
+			}
+		</style>
+
 
         <script src="js/leaflet.js"></script>
         <script src="js/togeojson.js"></script>
@@ -74,6 +90,9 @@
 			var capaPosiciones = L.layerGroup().addTo(map);
 			var iconosSize=[25,41];	
 			var perfilElevacion=null;
+			var _layer='';
+			var _inicio='';
+			var _fin='';
 
 			var baselayers = {
 				"Orotofoto IGN": OrtofotoIGN,
@@ -103,15 +122,27 @@
 				};
 				L.Control.FileLayerLoad.LABEL = '<img class="icon" src="css/images/folder.png" alt="file icon"/>';
 				var control = L.Control.fileLayerLoad({
+					position: 'topright',
 					fileSizeLimit: 2048,  //Comprobar si funciona. Por defecto 1024
 					layer: L.geoJson,
 					layerOptions: {
 							style: style,
-							pointToLayer: function (data, latlng) {
+							pointToLayer: function (data, latlng) {  // De momento no hace nada
+								/* NO FUNCIONA.  Pone todos WP como 'Comienzo'
+								console.log(data);
+								if (data.properties.type='Comienzo'){
+									return L.marker(
+										latlng, 
+										{icon: iSalida}
+									);
+								}
+								*/
+								/* DIBUJA CIRCULOS ROJOS en los WP
 								return L.circleMarker(
 									latlng,
 									{ style: style }
 								);
+								*/
 							}
 						},
 					addToMap: true,
@@ -122,9 +153,9 @@
 						'.kml'
 					]
 				}).addTo(map);
-				var layerswitcher= L.control.layers(baselayers, overlays,{collapsed:false}).addTo(map);
+				var layerswitcher= L.control.layers(baselayers, overlays,{collapsed:true}).addTo(map);
 			
-				control.loader.on('data:loaded', function (event) {   
+				control.loader.on('data:loaded', function (event) {  
 				layerswitcher.addOverlay(event.layer, event.filename);
 				});
 
@@ -400,6 +431,29 @@
 					}
 				});
 			}  // FIN graficaElevacion
+			
+			function layers_E(layer){
+				_layer=layer;
+			}
+
+
+			function props_E(prop){
+				var tipo='';
+				tipo=prop.type;
+				console.log(prop);
+				console.log(tipo);
+
+				if(tipo = "Comienzo"){
+					_inicio = prop.name;	
+
+					console.log(tipo);
+				}
+				if(prop.type = "Final"){
+					_fin = prop.name;
+					console.log(tipo);
+				}
+			}
+			
 			//Funciones
 		</script>
 	</body>

@@ -395,9 +395,9 @@ var toGeoJSON = (function() {
                     extend(link, getMulti(links[i], ['text', 'type']));
                     prop.links.push(link);
                 }
+                props_E(prop);
                 return prop;
             }
-            // console.log(gj);
             return gj;
         }
     };
