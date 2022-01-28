@@ -28,6 +28,10 @@
 				width: 44px;
 				height: 44px;
 			}
+
+			.hidden {
+				display: none;
+			}
 		</style>
 
 
@@ -38,6 +42,8 @@
 		<script src="js/tracks.js"></script>
     	<script src="js/bootstrap.js"></script>
 		<script src="js/chart.min.js"></script>
+		<script src="js/jquery-3.6.0.min.js"></script>
+
 		<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />	
 	</head>
 	<body>
@@ -432,28 +438,55 @@
 				});
 			}  // FIN graficaElevacion
 			
+			function content_E(content){
+				console.log(content);
+				//console.log(content.features.length);
+				//console.log(content.features);
+				//console.log(content.features[0].properties.desc);
+				//console.log(content.features[1].properties.type);
+
+				var _nombreFichero = document.getElementById('nombreFichero');
+				var _creador = document.getElementById('creador');
+				var _info = document.getElementById('info');
+				var _tituloInfo = document.getElementById('tituloInfo');
+
+				var nombreFichero = content.features[0].properties.name;
+				var desc = content.features[0].properties.desc;
+
+				_nombreFichero.innerHTML=nombreFichero;
+
+				if ((typeof desc === 'undefined') || (desc == '')){ // Si no hay descripcion
+				    desc = '';
+				    _tituloInfo.innerHTML='';
+				    _info.innerHTML='';
+
+				    $('#colInfo').addClass('hidden');
+				    $('#map').removeClass('col-sm-10').addClass('col-sm-12');
+
+				} else {
+					$('#colInfo').removeClass('hidden');
+				    $('#map').removeClass('col-sm-12').addClass('col-sm-10');
+
+				        _tituloInfo.innerHTML="Estadistica track";
+				        _info.innerHTML='<FONT SIZE=2>'+desc+'</font>';
+				}
+				var regs = content.features.length;
+
+				if (regs>1){
+				    for (var i=1; i<regs;i++){
+				        //console.log(content.features[i].type);
+				        //console.log(content.features[i].properties.name);
+				        //console.log(content.features[i].properties
+				    }
+				}
+
+			}
+
+
 			function layers_E(layer){
 				_layer=layer;
 			}
 
-
-			function props_E(prop){
-				var tipo='';
-				tipo=prop.type;
-				console.log(prop);
-				console.log(tipo);
-
-				if(tipo = "Comienzo"){
-					_inicio = prop.name;	
-
-					console.log(tipo);
-				}
-				if(prop.type = "Final"){
-					_fin = prop.name;
-					console.log(tipo);
-				}
-			}
-			
 			//Funciones
 		</script>
 	</body>

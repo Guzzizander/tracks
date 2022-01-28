@@ -208,40 +208,8 @@
                 layer.addTo(this._map);
             }
 
-//console.log(content);
-//console.log(content.features.length);
-//console.log(content.features);
-//console.log(content.features[0].properties.desc);
-//console.log(content.features[1].properties.type);
-
-var _nombreFichero = document.getElementById('nombreFichero');
-var _creador = document.getElementById('creador');
-var _info = document.getElementById('info');
-var _tituloInfo = document.getElementById('tituloInfo');
-
-var nombreFichero = '';
-var desc = content.features[0].properties.desc;
-
-if (typeof desc === 'undefined'){ // Si no hay descripcion
-    desc = '';
-    _tituloInfo.innerHTML='';
-    _info.innerHTML='';
-} else {
-        _tituloInfo.innerHTML="Estadistica track";
-        _info.innerHTML='<FONT SIZE=2>'+desc+'</font>';
-}
-var regs = content.features.length;
-
-if (regs>1){
-    for (var i=1; i<regs;i++){
-        //console.log(content.features[i].type);
-        //console.log(content.features[i].properties.name);
-        //console.log(content.features[i].properties
-    }
-}
-
+            content_E(content);
             layers_E(layer);
-
 
             return layer;
         },
