@@ -94,10 +94,6 @@
 				layers:[RasterIGN]
 				}).setView([41.125, 1.238], 10);
 
-				var capaRuta = L.layerGroup().addTo(map);
-				var capaIconos = L.layerGroup().addTo(map);
-				var capaPosiciones = L.layerGroup().addTo(map);
-
 			var baselayers = {
 				"Orotofoto IGN": OrtofotoIGN,
 				"Raster IGN": RasterIGN,
@@ -107,11 +103,7 @@
 				"OpenTopomap" : otmUrl
 			};
 
-			var overlays = {
-				//"Ruta": capaRuta,
-				//"Iconos": capaIconos,
-				"Posiciones":capaPosiciones
-			}
+			var overlays = {}
 			
 			L.control.scale({imperial:false}).addTo(map);	
 
@@ -224,7 +216,7 @@
 			});	
 			
 			var iWayPoint = L.icon({
-				iconUrl: 'images/gps.png',
+				iconUrl: 'css/images/gps.png',
 				iconSize:    iconosSize, // size of the icon
 			});	
 			// FIN Creo los iconos
@@ -235,35 +227,9 @@
 			  	return fichero.split('.').pop();
 			}
 
-/*
-
-			function onMapClick(e) { // Dibuja un marker en la posicion clickada
-				//capaPosiciones.clearLayers();
-				var posicionMarcador = e.latlng;
-				var posicionMarcadorTxt = e.latlng.lat+', '+e.latlng.lng;
-				L.marker(posicionMarcador,{icon: iMarcador}).addTo(capaPosiciones)
-					.bindPopup(posicionMarcadorTxt)
-					.openPopup();
-			}
-
-			function leerXML(xml){ // Abre el fichero de la ruta seleccionada
-				var xmlDoc = xml;
-				console.log(xmlDoc);
-				creador(xmlDoc); 				// Busca el creador de la ruta
-				buscaEstadisticas(xmlDoc);		// Busca las estadisticas de la ruta
-				cargaRuta(xmlDoc);				// Crea los arrays con los datos de la ruta
-				dibujaRuta(ruta);				// Dibuja la ruta en el mapa
-				wayPoints(xmlDoc);				// Dubuja los waypoints en el mapa
-				borraPerfil();
-				graficaElevacion();				// Dibuja la grafica del perfil de la ruta
-
-			}
-*/
-
 			function borraPerfil(){				// Borra la grafica del perfil anterior
 				if (perfilElevacion != null){
 					console.log("Borrando grafica anterior");
-					
 					// Primero elimino el canvas
 					const para = document.createElement('canvasPerfil');
 					//para.id = 'canvasPerfil';
@@ -274,110 +240,6 @@
 					parent.appendChild(para);		// Vuelvo a crear el canvas
 					
 				}				
-			}
-
-			function clearMap() { // Limpia el mapa de todos los elementos de la ruta anterior
-				capaRuta.clearLayers();
-				capaIconos.clearLayers();
-				for(i in map._layers) {
-					if(map._layers[i]._path != undefined) {
-						try {
-							map.removeLayer(map._layers[i]);
-						}
-						catch(e) {
-							console.log("problem with " + e + map._layers[i]);
-						}
-					}
-				}
-			}	
-		
-			function creador(xmlDoc){ // Busca el creador de la ruta
-				var x = xmlDoc.getElementsByTagName("gpx"); 
-				var creador = x[0].attributes['creator'].value;
-				document.getElementById("creador").innerHTML="Creado por: "+creador;
-			}
-
-			function buscaEstadisticas(xmlDoc){ // Busca las estadisticas de la ruta
-				var _info = document.getElementById('info');
-				var _tituloInfo = document.getElementById('tituloInfo');
-				try{
-					// Busca los tags "desc"
-					var x=xmlDoc.getElementsByTagName("desc");	  	
-					var info=x[1].childNodes[0].nodeValue;
-					_tituloInfo.innerHTML="Estadistica track";
-					_info.innerHTML='<FONT SIZE=2>'+info+'</font>';
-				} catch(e){
-					// Si no los encuentra
-					_tituloInfo.innerHTML='';
-					_info.innerHTML='';
-				}	
-			}
-	
-			function cargaRuta(xmlDoc){	// Crea los arrays con los datos de la ruta
-				var x=xmlDoc.getElementsByTagName("trkpt");
-				var latlang = [];
-				var ele = [];
-				// Vacio los arrays de la grafica del perfil para evitar que las graficas se acumulen.
-				elevacionX=[];
-				elevacionY=[];
-				for (i=0;i<x.length;i++){     
-					var arraytemp = [x[i].attributes['lat'].value, x[i].attributes['lon'].value]
-					latlang.push(arraytemp);
-				//	if (i%60 == 0){ // Coge la elevación cada minuto
-						elevacionY.push(x[i].getElementsByTagName('ele')[0].textContent);
-						elevacionX.push(i);
-					}
-				ruta=latlang;
-			}
-
-			function dibujaRuta(ruta){  // Dibuja la ruta en el mapa
-				var salida = ruta[0];  
-				var llegada = ruta[ruta.length-1];  
-				clearMap();
-				// Mueve el mapa a la salida de la ruta
-				map.setView(salida, 12);
-				
-				// Dibuja la ruta
-				var polyLineOptions = {
-					color:'red',
-	                weight: 5
-				};
-				var polyLine = L.polyline(ruta , polyLineOptions);
-				
-				polyLine.addTo(capaRuta);
-
-				// Para poner la ruta en el desplegable de los oveerlays.
-				/*
-				var capa=capaRuta.addLayer(polyLine);
-				layerswitcher.addOverlay(capa,nombreFichero);
-				   console.log(capa._leaflet_id); 
-				   console.log(capa);
-
-				map.removeLayer(capa);  // Esto la hace no visible pero el overlay no se borra
-				*/
-
-				L.marker(salida, {icon: iSalida}).addTo(capaIconos);
-				L.marker(llegada, {icon: iLlegada}).addTo(capaIconos);	 
-
-				map.fitBounds(polyLine.getBounds());
-			}
-
-			function wayPoints(xmlDoc){ // Dubuja los waypoints en el mapa
-				var x=xmlDoc.getElementsByTagName("wpt");
-				for(i=0;i<x.length;i++){
-					try{
-						var tipo = x[i].getElementsByTagName('type')[0].textContent;
-					} catch {
-						tipo='';
-					}
-					if (tipo != 'Comienzo' && tipo != 'Final'){
-						var nombre = x[i].getElementsByTagName('name')[0].textContent;
-						var arraytemp = [x[i].attributes['lat'].value, x[i].attributes['lon'].value,x[i]];
-						L.marker(arraytemp,{icon:iWayPoint}).addTo(capaIconos)
-							.bindPopup(nombre)
-							.openPopup();
-					}
-				}
 			}
 
 			function graficaElevacion(){ 
@@ -438,7 +300,9 @@
 				});
 			}  // FIN graficaElevacion
 
+			// Dibuja los iconos, waypoints y estadisticas
 			function content_E(content, layer){
+		console.log(content);s
 				var coords = content.features[0].geometry.coordinates.length;
 				var inicio = coordenadas(content.features[0].geometry.coordinates[0]);
 				var final = coordenadas(content.features[0].geometry.coordinates[coords-1]);
@@ -477,7 +341,7 @@
 					if (typeof content.features[i].properties.type === 'undefined'){
 						if ((content.features[i].properties.type != 'Comienzo') || (content.features[i].properties.type != 'Final')){
 							coords = coordenadas(content.features[i].geometry.coordinates);
-							L.marker(coords,{icon: iMarcador}).addTo(layer)
+							L.marker(coords,{icon: iWayPoint}).addTo(layer)
 								.bindPopup(content.features[i].properties.name)
 								.openPopup();
 						}
