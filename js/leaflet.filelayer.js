@@ -208,8 +208,7 @@
                 layer.addTo(this._map);
             }
 
-            content_E(content);
-            layers_E(layer);
+            content_E(content,layer);
 
             return layer;
         },
