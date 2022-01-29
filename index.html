@@ -66,7 +66,6 @@
 				</div>	
 			</div>
 			<div class="row" style="margin-left: 0px;" id="divPerfil">
-			<!--	<div class="col-sm-12" id="grafica"></div>  -->
 				<canvas id="canvasPerfil"></canvas>
 			</div>
 		</div>
@@ -80,8 +79,6 @@
 		    var nombre='';
 		    var xml = new XMLHttpRequest();
 			var ruta=[];
-			var elevacionX=[];
-			var elevacionY=[];
 			var iconosSize=[25,41];	
 			var anchor=[13, 41]
 			var perfilElevacion=null;			
@@ -123,21 +120,6 @@
 					layer: L.geoJson,
 					layerOptions: {
 						style: style,
-						pointToLayer: function (data, latlng) {  // De momento no hace nada
-							/* NO FUNCIONA.  Pone todos WP como 'Comienzo'
-							console.log(data);
-							if (data.properties.type='Comienzo'){
-								return L.marker(
-									latlng, 
-									{icon: iSalida}
-								);
-							}
-							// DIBUJA CIRCULOS ROJOS en los WP
-							return L.circleMarker(
-								latlng,
-								{ style: style });
-							*/
-						}
 					},
 					addToMap: true,
 					fileSizeLimit: 1024,
@@ -229,24 +211,21 @@
 
 			function borraPerfil(){				// Borra la grafica del perfil anterior
 				if (perfilElevacion != null){
-					console.log("Borrando grafica anterior");
-					// Primero elimino el canvas
-					const para = document.createElement('canvasPerfil');
-					//para.id = 'canvasPerfil';
+					perfilElevacion.destroy();	
+					document.getElementById('canvasPerfil').remove();
+					const para = document.createElement('canvas');
+					para.id='canvasPerfil';
 					var parent = document.getElementById('divPerfil');
-					perfilElevacion.destroy();		// Borro la grafica anterior					
-					var tag = document.getElementById(para.id);
-					tag.remove();		// Borro el canvas
 					parent.appendChild(para);		// Vuelvo a crear el canvas
 					
 				}				
 			}
 
-			function graficaElevacion(){ 
+			function graficaElevacion(elevacionX,elevacionY){ 
 				var perfil = document.getElementById("canvasPerfil").getContext('2d');
 				perfil.canvas.width = screen.width;
 				perfil.canvas.height = 150;
-				perfilRuta = new Chart(perfil, {
+				perfilElevacion = new Chart(perfil, {
 					type: 'line',
 					data: {
 						labels:elevacionX,
@@ -302,23 +281,21 @@
 
 			// Dibuja los iconos, waypoints y estadisticas
 			function content_E(content, layer){
-		console.log(content);s
+				var elevacionX=[];
+				var elevacionY=[];
 				var coords = content.features[0].geometry.coordinates.length;
 				var inicio = coordenadas(content.features[0].geometry.coordinates[0]);
 				var final = coordenadas(content.features[0].geometry.coordinates[coords-1]);
 				var wps = content.features.length; 
-
-				L.marker(inicio, {icon: iSalida}).addTo(layer);
-				L.marker(final, {icon: iLlegada}).addTo(layer);
-
 				var _nombreFichero = document.getElementById('nombreFichero');
 				var _creador = document.getElementById('creador');
 				var _info = document.getElementById('info');
 				var _tituloInfo = document.getElementById('tituloInfo');
-
 				var nombreFichero = content.features[0].properties.name;
 				var desc = content.features[0].properties.desc;
 
+				L.marker(inicio, {icon: iSalida}).addTo(layer);
+				L.marker(final, {icon: iLlegada}).addTo(layer);
 				_nombreFichero.innerHTML=nombreFichero;
 
 				if ((typeof desc === 'undefined') || (desc == '')){ // Si no hay descripcion quito el div.row de la derecha
@@ -329,7 +306,8 @@
 				    $('#colInfo').addClass('hidden');
 				    $('#map').removeClass('col-sm-10').addClass('col-sm-12');
 
-				} else {  // Si no lo vuelvo a pintar							
+				} 
+				else {  // Si no lo vuelvo a pintar							
 					$('#colInfo').removeClass('hidden');
 				    $('#map').removeClass('col-sm-12').addClass('col-sm-10');
 
@@ -347,6 +325,15 @@
 						}
 					}
 				}
+				
+
+				for (var i=0; i < coords ;i++){
+					elevacionY.push(content.features[0].geometry.coordinates[i][2]);
+					elevacionX.push(i);
+				}
+
+				borraPerfil();
+				graficaElevacion(elevacionX,elevacionY);
 
 			}
 
