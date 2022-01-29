@@ -81,7 +81,8 @@
 			var ruta=[];
 			var iconosSize=[25,41];	
 			var anchor=[13, 41]
-			var perfilElevacion=null;			
+			var perfilElevacion=null;
+			var control;			
 			// FIN Variables locales 	
 
 			// Definicion mapa Leaflet		
@@ -114,7 +115,7 @@
 					clickable: false
 				};
 				L.Control.FileLayerLoad.LABEL = '<img class="icon" src="css/images/folder.png" alt="file icon"/>';
-				var control = L.Control.fileLayerLoad({
+				control = L.Control.fileLayerLoad({
 					position: 'topright',
 					fileSizeLimit: 2048,  //Comprobar si funciona. Por defecto 1024
 					layer: L.geoJson,
@@ -131,12 +132,13 @@
 				}).addTo(map);
 				var layerswitcher= L.control.layers(baselayers, overlays,{collapsed:true}).addTo(map);
 			
-				control.loader.on('data:loaded', function (event) {  
-				layerswitcher.addOverlay(event.layer, event.filename);
+				control.loader.on('data:loaded', function (event) {
+					document.getElementById('nombreFichero').innerHTML=event.filename
+					layerswitcher.addOverlay(event.layer, event.filename);
 				});
 
 				control.loader.on('data:error', function (error) {
-				alert(error.error.message);
+					alert(error.error.message);
 				});
 			}
 
@@ -287,16 +289,13 @@
 				var inicio = coordenadas(content.features[0].geometry.coordinates[0]);
 				var final = coordenadas(content.features[0].geometry.coordinates[coords-1]);
 				var wps = content.features.length; 
-				var _nombreFichero = document.getElementById('nombreFichero');
 				var _creador = document.getElementById('creador');
 				var _info = document.getElementById('info');
 				var _tituloInfo = document.getElementById('tituloInfo');
-				var nombreFichero = content.features[0].properties.name;
 				var desc = content.features[0].properties.desc;
 
 				L.marker(inicio, {icon: iSalida}).addTo(layer);
 				L.marker(final, {icon: iLlegada}).addTo(layer);
-				_nombreFichero.innerHTML=nombreFichero;
 
 				if ((typeof desc === 'undefined') || (desc == '')){ // Si no hay descripcion quito el div.row de la derecha
 				    desc = '';
