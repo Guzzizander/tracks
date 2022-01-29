@@ -437,13 +437,12 @@
 					}
 				});
 			}  // FIN graficaElevacion
-			
+
 			function content_E(content, layer){
-	//console.log(content);
-				var regs = content.features.length;
 				var coords = content.features[0].geometry.coordinates.length;
-				var inicio = [content.features[0].geometry.coordinates[0][1],content.features[0].geometry.coordinates[0][0]];
-				var final = [content.features[0].geometry.coordinates[coords-1][1],content.features[0].geometry.coordinates[coords-1][0]];
+				var inicio = coordenadas(content.features[0].geometry.coordinates[0]);
+				var final = coordenadas(content.features[0].geometry.coordinates[coords-1]);
+				var wps = content.features.length; 
 
 				L.marker(inicio, {icon: iSalida}).addTo(layer);
 				L.marker(final, {icon: iLlegada}).addTo(layer);
@@ -458,7 +457,7 @@
 
 				_nombreFichero.innerHTML=nombreFichero;
 
-				if ((typeof desc === 'undefined') || (desc == '')){ // Si no hay descripcion
+				if ((typeof desc === 'undefined') || (desc == '')){ // Si no hay descripcion quito el div.row de la derecha
 				    desc = '';
 				    _tituloInfo.innerHTML='';
 				    _info.innerHTML='';
@@ -466,7 +465,7 @@
 				    $('#colInfo').addClass('hidden');
 				    $('#map').removeClass('col-sm-10').addClass('col-sm-12');
 
-				} else {
+				} else {  // Si no lo vuelvo a pintar							
 					$('#colInfo').removeClass('hidden');
 				    $('#map').removeClass('col-sm-12').addClass('col-sm-10');
 
@@ -474,15 +473,23 @@
 				        _info.innerHTML='<FONT SIZE=2>'+desc+'</font>';
 				}
 
-
-				if (regs>1){
-				    for (var i=1; i<regs;i++){
-				        console.log(content.features[i].type);
-				        console.log(content.features[i].properties.name);
-				        console.log(content.features[i].properties
-				    }
+				for (var i=1; i<wps; i++){
+					if (typeof content.features[i].properties.type === 'undefined'){
+						if ((content.features[i].properties.type != 'Comienzo') || (content.features[i].properties.type != 'Final')){
+							coords = coordenadas(content.features[i].geometry.coordinates);
+							L.marker(coords,{icon: iMarcador}).addTo(layer)
+								.bindPopup(content.features[i].properties.name)
+								.openPopup();
+						}
+					}
 				}
 
+			}
+
+			function coordenadas(coordenadas){
+				// cambia las posiciones del array ya que vienen invertidas de orden
+				var coords = [coordenadas[1],coordenadas[0]];
+				return coords;
 			}
 			//Funciones
 		</script>
