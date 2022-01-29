@@ -79,6 +79,12 @@
 			// Variables globales
 		    var nombre='';
 		    var xml = new XMLHttpRequest();
+			var ruta=[];
+			var elevacionX=[];
+			var elevacionY=[];
+			var iconosSize=[25,41];	
+			var anchor=[13, 41]
+			var perfilElevacion=null;			
 			// FIN Variables locales 	
 
 			// Definicion mapa Leaflet		
@@ -88,17 +94,9 @@
 				layers:[RasterIGN]
 				}).setView([41.125, 1.238], 10);
 
-			var ruta=[];
-			var elevacionX=[];
-			var elevacionY=[];
-			var capaRuta = L.layerGroup().addTo(map);
-			var capaIconos = L.layerGroup().addTo(map);
-			var capaPosiciones = L.layerGroup().addTo(map);
-			var iconosSize=[25,41];	
-			var perfilElevacion=null;
-			var _layer='';
-			var _inicio='';
-			var _fin='';
+				var capaRuta = L.layerGroup().addTo(map);
+				var capaIconos = L.layerGroup().addTo(map);
+				var capaPosiciones = L.layerGroup().addTo(map);
 
 			var baselayers = {
 				"Orotofoto IGN": OrtofotoIGN,
@@ -120,10 +118,10 @@
 			if (CARGAFICHERO){
 			// Carga de fichero desde el icono	
 				var style = {
-					color: 'red',
+					color: 'blue',
 					opacity: 1.0,
 					fillOpacity: 1.0,
-					weight: 2,
+					weight: 4,
 					clickable: false
 				};
 				L.Control.FileLayerLoad.LABEL = '<img class="icon" src="css/images/folder.png" alt="file icon"/>';
@@ -132,25 +130,23 @@
 					fileSizeLimit: 2048,  //Comprobar si funciona. Por defecto 1024
 					layer: L.geoJson,
 					layerOptions: {
-							style: style,
-							pointToLayer: function (data, latlng) {  // De momento no hace nada
-								/* NO FUNCIONA.  Pone todos WP como 'Comienzo'
-								console.log(data);
-								if (data.properties.type='Comienzo'){
-									return L.marker(
-										latlng, 
-										{icon: iSalida}
-									);
-								}
-								*/
-								/* DIBUJA CIRCULOS ROJOS en los WP
-								return L.circleMarker(
-									latlng,
-									{ style: style }
+						style: style,
+						pointToLayer: function (data, latlng) {  // De momento no hace nada
+							/* NO FUNCIONA.  Pone todos WP como 'Comienzo'
+							console.log(data);
+							if (data.properties.type='Comienzo'){
+								return L.marker(
+									latlng, 
+									{icon: iSalida}
 								);
-								*/
 							}
-						},
+							// DIBUJA CIRCULOS ROJOS en los WP
+							return L.circleMarker(
+								latlng,
+								{ style: style });
+							*/
+						}
+					},
 					addToMap: true,
 					fileSizeLimit: 1024,
 					formats: [
@@ -201,13 +197,14 @@
 			// FIN Definicion mapa Leaflet
 			
 			// Eventos
-			map.on('click', onMapClick);
+			//map.on('click', onMapClick);
 			// FIN Eventos
 
 			// Creo los iconos
 			var iSalida = L.icon({
 				iconUrl: 'css/images/start.png',
 				iconSize:     iconosSize, // size of the icon				
+				iconAnchor: anchor
 				//  shadowUrl: 'leaf-shadow.png',
 				//shadowSize:   [50, 64], // size of the shadow
 				//iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
@@ -219,6 +216,7 @@
 			var iLlegada = L.icon({
 				iconUrl: 'css/images/racing-flag.png',
 				iconSize:    iconosSize, // size of the icon
+				iconAnchor: anchor
 			});
 
 			var iMarcador = L.icon({
@@ -237,6 +235,7 @@
 			  	return fichero.split('.').pop();
 			}
 
+/*
 
 			function onMapClick(e) { // Dibuja un marker en la posicion clickada
 				//capaPosiciones.clearLayers();
@@ -259,6 +258,7 @@
 				graficaElevacion();				// Dibuja la grafica del perfil de la ruta
 
 			}
+*/
 
 			function borraPerfil(){				// Borra la grafica del perfil anterior
 				if (perfilElevacion != null){
@@ -438,12 +438,15 @@
 				});
 			}  // FIN graficaElevacion
 			
-			function content_E(content){
-				console.log(content);
-				//console.log(content.features.length);
-				//console.log(content.features);
-				//console.log(content.features[0].properties.desc);
-				//console.log(content.features[1].properties.type);
+			function content_E(content, layer){
+	//console.log(content);
+				var regs = content.features.length;
+				var coords = content.features[0].geometry.coordinates.length;
+				var inicio = [content.features[0].geometry.coordinates[0][1],content.features[0].geometry.coordinates[0][0]];
+				var final = [content.features[0].geometry.coordinates[coords-1][1],content.features[0].geometry.coordinates[coords-1][0]];
+
+				L.marker(inicio, {icon: iSalida}).addTo(layer);
+				L.marker(final, {icon: iLlegada}).addTo(layer);
 
 				var _nombreFichero = document.getElementById('nombreFichero');
 				var _creador = document.getElementById('creador');
@@ -470,23 +473,17 @@
 				        _tituloInfo.innerHTML="Estadistica track";
 				        _info.innerHTML='<FONT SIZE=2>'+desc+'</font>';
 				}
-				var regs = content.features.length;
+
 
 				if (regs>1){
 				    for (var i=1; i<regs;i++){
-				        //console.log(content.features[i].type);
-				        //console.log(content.features[i].properties.name);
-				        //console.log(content.features[i].properties
+				        console.log(content.features[i].type);
+				        console.log(content.features[i].properties.name);
+				        console.log(content.features[i].properties
 				    }
 				}
 
 			}
-
-
-			function layers_E(layer){
-				_layer=layer;
-			}
-
 			//Funciones
 		</script>
 	</body>
