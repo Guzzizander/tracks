@@ -82,7 +82,8 @@
 			var iconosSize=[25,41];	
 			var anchor=[13, 41]
 			var perfilElevacion=null;
-			var control;			
+			var control;		
+			var layer;	
 			// FIN Variables locales 	
 
 			// Definicion mapa Leaflet		
@@ -133,8 +134,15 @@
 				var layerswitcher= L.control.layers(baselayers, overlays,{collapsed:true}).addTo(map);
 			
 				control.loader.on('data:loaded', function (event) {
-					document.getElementById('nombreFichero').innerHTML=event.filename
-					layerswitcher.addOverlay(event.layer, event.filename);
+
+					if(layer){
+						layer.remove();
+						layerswitcher.removeLayer(layer);
+					} else {
+						layer=event.layer;
+					}
+					layerswitcher.addOverlay(event.layer, event.filename);  // Añade un checkBox al fileLayerControl
+					document.getElementById('nombreFichero').innerHTML=event.filename;
 				});
 
 				control.loader.on('data:error', function (error) {
