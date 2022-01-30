@@ -83,7 +83,7 @@
 			var anchor=[13, 41]
 			var perfilElevacion=null;
 			var control;		
-			var layer;	
+			var layerAnt;	
 			// FIN Variables locales 	
 
 			// Definicion mapa Leaflet		
@@ -134,14 +134,15 @@
 				var layerswitcher= L.control.layers(baselayers, overlays,{collapsed:true}).addTo(map);
 			
 				control.loader.on('data:loaded', function (event) {
-
-					if(layer){
-						layer.remove();
-						layerswitcher.removeLayer(layer);
-					} else {
+					if(layerAnt){
 						layer=event.layer;
+						layerswitcher.removeLayer(layerAnt);
+						layerAnt.remove();
+						layerswitcher.addOverlay(event.layer, event.filename);  // Añade un checkBox al fileLayerControl
+					} else {
+						layerswitcher.addOverlay(event.layer, event.filename);  // Añade un checkBox al fileLayerControl
 					}
-					layerswitcher.addOverlay(event.layer, event.filename);  // Añade un checkBox al fileLayerControl
+					layerAnt=event.layer;					
 					document.getElementById('nombreFichero').innerHTML=event.filename;
 				});
 
