@@ -21,12 +21,13 @@
 				height: 44px;
 				max-width: 70%;
 				max-height: 70%;
-				margin: 4px;
-				align-items: center
+				margin: 5px;
 			}
 			.leaflet-control-filelayer{
-				width: 44px;
-				height: 44px;
+				width: 47px;
+				height: 47px;
+				background-color: white;
+				align-items: center
 			}
 
 			.hidden {
@@ -138,6 +139,9 @@
 						'.kml'
 					]
 				}).addTo(map);
+
+				$("a[class*='leaflet-control-filelayer']").addClass('icon');
+
 				var layerswitcher= L.control.layers(baselayers, overlays,{collapsed:true}).addTo(map);
 			
 				control.loader.on('data:loaded', function (event) {
