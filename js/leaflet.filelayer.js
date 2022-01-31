@@ -306,7 +306,6 @@
             link.innerHTML = L.Control.FileLayerLoad.LABEL;
             link.href = '#';
             link.title = L.Control.FileLayerLoad.TITLE;
-            link.id='link';
 
             // Create an invisible file input
             fileInput = L.DomUtil.create('input', 'hidden', container);
