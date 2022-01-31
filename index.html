@@ -122,6 +122,10 @@
 					layer: L.geoJson,
 					layerOptions: {
 						style: style,
+						pointToLayer: function (data, latlng) {
+									//return L.circleMarker(latlng, {style: style});
+									return null;
+								},
 					},
 					addToMap: true,
 					fileSizeLimit: 1024,
