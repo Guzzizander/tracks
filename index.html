@@ -124,7 +124,10 @@
 						style: style,
 						pointToLayer: function (data, latlng) {
 									//return L.circleMarker(latlng, {style: style});
-									return null;
+									//return null;
+									return L.marker(latlng,{icon: iWayPoint})
+										.bindPopup(data.properties.name)
+										.openPopup();
 								},
 					},
 					addToMap: true,
@@ -326,18 +329,6 @@
 				        _tituloInfo.innerHTML="Estadistica track";
 				        _info.innerHTML='<FONT SIZE=2>'+desc+'</font>';
 				}
-
-				for (var i=1; i<wps; i++){
-					if (typeof content.features[i].properties.type === 'undefined'){
-						if ((content.features[i].properties.type != 'Comienzo') || (content.features[i].properties.type != 'Final')){
-							coords = coordenadas(content.features[i].geometry.coordinates);
-							L.marker(coords,{icon: iWayPoint}).addTo(layer)
-								.bindPopup(content.features[i].properties.name)
-								.openPopup();
-						}
-					}
-				}
-				
 
 				for (var i=0; i < coords ;i++){
 					elevacionY.push(content.features[0].geometry.coordinates[i][2]);
