@@ -22,6 +22,7 @@
 				max-width: 70%;
 				max-height: 70%;
 				margin: 5px;
+				border: none !important;
 			}
 			.leaflet-control-filelayer{
 				width: 47px;
@@ -243,6 +244,51 @@
 				}				
 			}
 
+			var options ={
+				scales: {
+					xAxes: {
+						display: false,
+						scaleLabel: {
+						display: false,
+						labelString: 'Tiempo'
+						}
+					},
+					yAxes:{
+						display: true,
+						scaleLabel: {
+						display: true,
+						labelString: 'Elevacion'
+						}
+					}
+				},
+				plugins: {
+					title: {
+						display: true,
+						text: 'Perfil Ruta',
+					},
+					legend: {
+						display: false
+					},
+					tooltip: {
+						displayColors:false,						
+				       	filter: function (tooltipItem, data) {
+				       		console.log( tooltipItem);
+				       		//tooltipItem.formattedValue
+				       		L.marker(latlng,{icon: iWayPoint})
+				       		L.marker().addToMap;
+				           return tooltipItem.label === 'Red';
+				       },
+				        callbacks: {
+				            title: function (tooltipItem, data) { 
+				               	// return "Día " + data.labels[tooltipItem[0].index]; 
+				               	return null;
+				            }
+        				}
+				    }
+				}				
+			}
+
+
 			function graficaElevacion(elevacionX,elevacionY){ 
 				var perfil = document.getElementById("canvasPerfil").getContext('2d');
 				perfil.canvas.width = screen.width;
@@ -268,36 +314,7 @@
 							borderWidth: 1
 						}]
 					},
-					options: {
-					    tooltips: {
-					         enabled: false
-					    },
-						scales: {
-							xAxes: {
-								display: false,
-								scaleLabel: {
-								display: false,
-								labelString: 'Tiempo'
-								}
-							},
-							yAxes:{
-								display: true,
-								scaleLabel: {
-								display: true,
-								labelString: 'Elevacion'
-								}
-							}
-						},
-						plugins: {
-							title: {
-								display: true,
-								text: 'Perfil Ruta',
-							},
-							legend: {
-								display: false
-							}
-						}
-					}
+					options: options
 				});
 			}  // FIN graficaElevacion
 
