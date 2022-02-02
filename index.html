@@ -84,7 +84,9 @@
 			var iconosSize=[25,41];	
 			var anchor=[13, 41]
 			var perfilElevacion=null;
-			var control;		
+			var control;	
+			var coordenadasArray=[];	
+			var posicionAnt=0;
 			var layerAnt;	
 			// FIN Variables locales 	
 
@@ -271,16 +273,15 @@
 					},
 					tooltip: {
 						displayColors:false,						
-				       	filter: function (tooltipItem, data) {
-				       		console.log( tooltipItem);
-				       		//tooltipItem.formattedValue
-				       		L.marker(latlng,{icon: iWayPoint})
-				       		L.marker().addToMap;
-				           return tooltipItem.label === 'Red';
-				       },
 				        callbacks: {
 				            title: function (tooltipItem, data) { 
-				               	// return "Día " + data.labels[tooltipItem[0].index]; 
+				               	//console.log(tooltipItem);
+				               	if (posicionAnt!=0){
+				               		map.removeLayer(posicionAnt);
+				               	}
+				               	var pos=L.marker([coordenadasArray[tooltipItem[0].label][1],coordenadasArray[tooltipItem[0].label][0]],iMarcador);
+				               	map.addLayer(pos);
+				               	posicionAnt=pos;
 				               	return null;
 				            }
         				}
@@ -325,6 +326,7 @@
 				var coords = content.features[0].geometry.coordinates.length;
 				var inicio = coordenadas(content.features[0].geometry.coordinates[0]);
 				var final = coordenadas(content.features[0].geometry.coordinates[coords-1]);
+				coordenadasArray=content.features[0].geometry.coordinates;
 				var wps = content.features.length; 
 				var _creador = document.getElementById('creador');
 				var _info = document.getElementById('info');
